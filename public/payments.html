@@ -55,6 +55,46 @@
             border-radius: 5px;
             text-align: left;
         }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .back-button {
+                margin-top: 10px;
+                width: 80%;
+                text-align: center;
+            }
+            .payments-container {
+                width: 90%;
+                margin: 30px auto;
+                padding: 15px;
+            }
+            .payment-list li {
+                font-size: 14px;
+                padding: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            .back-button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .payments-container {
+                width: 95%;
+                padding: 10px;
+            }
+            .payment-list li {
+                font-size: 12px;
+                padding: 8px;
+            }
+        }
     </style>
 </head>
 <body>

@@ -16,10 +16,10 @@
         .header {
             display: flex;
             justify-content: space-between;
+            align-items: center;
             padding: 15px;
             background: #6a5acd;
             color: white;
-            align-items: center;
         }
         .back-button {
             background: white;
@@ -41,11 +41,12 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            width: 22%;
+            width: 30%;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             text-align: center;
             transition: transform 0.3s ease-in-out, border 0.3s ease-in-out;
             border: 2px solid transparent;
+            margin-bottom: 20px;
         }
         .plan:hover {
             transform: scale(1.05);
@@ -81,6 +82,50 @@
         }
         .choose-btn:hover {
             background: #483d8b;
+        }
+
+        /* ✅ Responsive Design */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .back-button {
+                margin-top: 10px;
+                width: 80%;
+                text-align: center;
+            }
+            .container {
+                flex-direction: column;
+                align-items: center;
+                width: 90%;
+                margin: 30px auto;
+            }
+            .plan {
+                width: 90%;
+                margin-bottom: 15px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 20px;
+            }
+            .back-button {
+                font-size: 14px;
+                padding: 8px 12px;
+            }
+            .container {
+                width: 95%;
+                margin-top: 20px;
+            }
+            .plan {
+                width: 100%;
+                padding: 15px;
+            }
+            .choose-btn {
+                padding: 8px;
+            }
         }
     </style>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
