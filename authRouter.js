@@ -5,6 +5,7 @@ const User = require("./userModel");
 
 const router = express.Router();
 
+// User Signup
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -26,6 +27,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
+// User Login
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -45,6 +47,42 @@ router.post("/login", async (req, res) => {
   } catch (error) {
     res.status(500).json({ msg: "Server error", error: error.message });
   }
+});
+
+// Fetch User Profile
+router.get("/profile", async (req, res) => {
+    try {
+        const token = req.header("Authorization");
+        if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id).select("-password");
+        if (!user) return res.status(404).json({ msg: "User not found" });
+
+        res.json(user);
+    } catch (error) {
+        res.status(500).json({ msg: "Server error", error: error.message });
+    }
+});
+
+// Update Password
+router.post("/update-password", async (req, res) => {
+    try {
+        const token = req.header("Authorization");
+        if (!token) return res.status(401).json({ msg: "No token, authorization denied" });
+
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const { password } = req.body;
+
+        if (!password) return res.status(400).json({ msg: "Password is required" });
+
+        const hashedPassword = await bcrypt.hash(password, 10);
+        await User.findByIdAndUpdate(decoded.id, { password: hashedPassword });
+
+        res.json({ msg: "Password updated successfully" });
+    } catch (error) {
+        res.status(500).json({ msg: "Server error", error: error.message });
+    }
 });
 
 module.exports = router;
