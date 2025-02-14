@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payments</title>
+  
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #6a5acd;
+            color: white;
+            align-items: center;
+        }
+        .back-button {
+            background: white;
+            color: #6a5acd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .payments-container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .payment-status {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .payment-list {
+            list-style: none;
+            padding: 0;
+        }
+        .payment-list li {
+            background: #f1f1f1;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Payments</h1>
+        <a href="homepage.html" class="back-button">Back to Home</a>
+    </div>
+    <div class="payments-container">
+        <h2>Your Payment Status</h2>
+        <p class="payment-status">Fetching payment details...</p>
+        <ul class="payment-list" id="payment-list"></ul>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+
+            fetch("/payment-status", {
+                headers: { "Authorization": token }
+            })
+            .then(response => response.json())
+            .then(data => {
+                const paymentList = document.getElementById("payment-list");
+                paymentList.innerHTML = ""; // Clear existing content
+
+                if (data.payments && data.payments.length > 0) {
+                    data.payments.forEach(payment => {
+                        const listItem = document.createElement("li");
+                        listItem.textContent = `${payment.plan} - ₹${payment.amount} - ${payment.status}`;
+                        paymentList.appendChild(listItem);
+                    });
+                } else {
+                    paymentList.innerHTML = "<li>No payments found</li>";
+                }
+            })
+            .catch(() => {
+                document.querySelector(".payment-status").textContent = "Error fetching payment details.";
+            });
+        });
+    </script>
+</body>
+</html>

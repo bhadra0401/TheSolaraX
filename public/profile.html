@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile</title>
+ 
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px;
+            background: #6a5acd;
+            color: white;
+            align-items: center;
+        }
+        .back-button {
+            background: white;
+            color: #6a5acd;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .profile-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .profile-icon {
+            font-size: 100px;
+            color: #6a5acd;
+            margin-bottom: 15px;
+        }
+        .profile-info h2 {
+            margin: 10px 0;
+            color: #333;
+        }
+        .profile-info p {
+            color: gray;
+        }
+        .forgot-password {
+            display: inline-block;
+            margin-top: 15px;
+            color: #6a5acd;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+        #reset-password-section {
+            display: none;
+            margin-top: 20px;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        button {
+            background: #6a5acd;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #483d8b;
+        }
+    </style>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="header">
+        <h1>User Profile</h1>
+        <a href="homepage.html" class="back-button">Back to Home</a>
+    </div>
+    <div class="profile-container">
+        <i class="fas fa-user-circle profile-icon"></i>
+        <div class="profile-info">
+            <h2 id="username">Loading...</h2>
+            <p id="useremail">Loading...</p>
+            <button onclick="showResetPassword()">Forgot Password?</button>
+        </div>
+        <div id="reset-password-section">
+            <input type="password" id="new-password" placeholder="Enter new password">
+            <button onclick="updatePassword()">Update Password</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const token = localStorage.getItem("token");
+            if (!token) {
+                window.location.href = "index.html"; // Redirect to login if not authenticated
+            }
+
+            fetch("/auth/profile", {
+                headers: { "Authorization": token }
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("username").textContent = data.name;
+                document.getElementById("useremail").textContent = data.email;
+            })
+            .catch(() => {
+                alert("Error fetching profile details.");
+            });
+        });
+
+        function showResetPassword() {
+            document.getElementById("reset-password-section").style.display = "block";
+        }
+
+        function updatePassword() {
+            const newPassword = document.getElementById("new-password").value;
+            fetch("/auth/update-password", {
+                method: "POST",
+                headers: {
+                    "Authorization": localStorage.getItem("token"),
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ password: newPassword })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.msg))
+            .catch(() => alert("Error updating password."));
+        }
+    </script>
+</body>
+</html>
