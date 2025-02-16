@@ -3,40 +3,44 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Profile</title>
- 
+    <title>User Profile | zeBRO</title>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="style.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
+            font-family: 'Poppins', sans-serif;
             text-align: center;
+            background: #f4f4f4;
         }
         .header {
+            background: linear-gradient(135deg, #6a5acd, #483d8b);
+            color: white;
+            padding: 20px;
             display: flex;
             justify-content: space-between;
-            padding: 15px;
-            background: #6a5acd;
-            color: white;
             align-items: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
         }
         .back-button {
             background: white;
             color: #6a5acd;
             padding: 10px 15px;
-            border-radius: 5px;
+            border-radius: 6px;
+            font-weight: 500;
             cursor: pointer;
             text-decoration: none;
-            font-weight: bold;
+            transition: 0.3s;
+        }
+        .back-button:hover {
+            background: #ddd;
         }
         .profile-container {
-            max-width: 600px;
+            max-width: 500px;
             margin: 50px auto;
             background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
             text-align: center;
         }
         .profile-icon {
@@ -46,17 +50,20 @@
         }
         .profile-info h2 {
             margin: 10px 0;
-            color: #333;
+            font-size: 24px;
         }
         .profile-info p {
             color: gray;
+            font-size: 16px;
         }
         .forgot-password {
             display: inline-block;
             margin-top: 15px;
-            color: #6a5acd;
+            color: #000000;
             text-decoration: none;
-            font-weight: bold;
+            font-weight: 500;
+            cursor: pointer;
+            transition: 0.3s;
         }
         .forgot-password:hover {
             text-decoration: underline;
@@ -66,26 +73,29 @@
             margin-top: 20px;
         }
         input {
-            width: 90%;
-            padding: 10px;
+            width: 100%;
+            padding: 12px;
             margin-top: 10px;
             border: 1px solid #ccc;
-            border-radius: 5px;
+            border-radius: 6px;
         }
         button {
+            width: 100%;
             background: #6a5acd;
             color: white;
             border: none;
-            padding: 10px;
-            border-radius: 5px;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
             cursor: pointer;
-            margin-top: 10px;
+            transition: 0.3s;
         }
         button:hover {
             background: #483d8b;
+            transform: scale(1.05);
         }
     </style>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
     <div class="header">
@@ -97,50 +107,68 @@
         <div class="profile-info">
             <h2 id="username">Loading...</h2>
             <p id="useremail">Loading...</p>
-            <button onclick="showResetPassword()">Forgot Password?</button>
+            <button class="forgot-password" onclick="toggleResetPassword()">Change Password</button>
         </div>
         <div id="reset-password-section">
+            <input type="password" id="old-password" placeholder="Enter old password">
             <input type="password" id="new-password" placeholder="Enter new password">
             <button onclick="updatePassword()">Update Password</button>
         </div>
     </div>
-
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const token = localStorage.getItem("token");
             if (!token) {
-                window.location.href = "index.html"; // Redirect to login if not authenticated
+                window.location.href = "index.html";
+                return;
             }
-
-            fetch("/auth/profile", {
-                headers: { "Authorization": token }
+            fetch("https://thesolarax.onrender.com/auth/profile", {
+                headers: { "Authorization": `Bearer ${token}` }
             })
             .then(response => response.json())
             .then(data => {
-                document.getElementById("username").textContent = data.name;
-                document.getElementById("useremail").textContent = data.email;
+                if (data.name) {
+                    document.getElementById("username").textContent = data.name;
+                    document.getElementById("useremail").textContent = data.email;
+                } else {
+                    alert("Error fetching profile details.");
+                }
             })
             .catch(() => {
                 alert("Error fetching profile details.");
+                localStorage.removeItem("token");
+                window.location.href = "index.html";
             });
         });
-
-        function showResetPassword() {
-            document.getElementById("reset-password-section").style.display = "block";
+        function toggleResetPassword() {
+            const resetSection = document.getElementById("reset-password-section");
+            resetSection.style.display = resetSection.style.display === "none" || resetSection.style.display === "" ? "block" : "none";
         }
-
         function updatePassword() {
-            const newPassword = document.getElementById("new-password").value;
-            fetch("/auth/update-password", {
+            const oldPassword = document.getElementById("old-password").value.trim();
+            const newPassword = document.getElementById("new-password").value.trim();
+            if (!oldPassword || !newPassword) {
+                alert("Please enter both old and new passwords.");
+                return;
+            }
+            fetch("https://thesolarax.onrender.com/auth/update-password", {
                 method: "POST",
                 headers: {
-                    "Authorization": localStorage.getItem("token"),
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`,
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ password: newPassword })
+                body: JSON.stringify({ oldPassword, newPassword })
             })
             .then(response => response.json())
-            .then(data => alert(data.msg))
+            .then(data => {
+                if (data.msg === "Password updated successfully") {
+                    alert("Password updated successfully! Please log in again.");
+                    localStorage.removeItem("token");
+                    window.location.href = "index.html";
+                } else {
+                    alert(data.msg);
+                }
+            })
             .catch(() => alert("Error updating password."));
         }
     </script>

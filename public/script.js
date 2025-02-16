@@ -1,72 +1,120 @@
-document.addEventListener("DOMContentLoaded", function () {
-  const signupForm = document.getElementById("signup-form");
-  const loginForm = document.getElementById("login-form");
-  const container = document.getElementById("container");
-  const registerBtn = document.getElementById("register");
-  const loginBtn = document.getElementById("login");
+const express = require("express");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const User = require("./userModel");
 
-  // Toggle Signup & Login
-  registerBtn.addEventListener("click", () => container.classList.add("active"));
-  loginBtn.addEventListener("click", () => container.classList.remove("active"));
+const router = express.Router();
 
-  // ✅ Signup API Call
-  signupForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+// ✅ Middleware to Verify JWT Token
+const verifyToken = (req, res, next) => {
+  try {
+    let token = req.header("Authorization");
+    if (!token) return res.status(401).json({ msg: "Unauthorized, No Token" });
 
-    const name = document.getElementById("signup-name").value.trim();
-    const email = document.getElementById("signup-email").value.trim();
-    const password = document.getElementById("signup-password").value.trim();
+    token = token.replace("Bearer ", "");
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
+    req.user = decoded;
+    next();
+  } catch (error) {
+    console.error("❌ Token Verification Failed:", error.message);
+    res.status(401).json({ msg: "Invalid or expired token" });
+  }
+};
 
+// ✅ User Signup
+router.post("/signup", async (req, res) => {
+  try {
+    console.log("Signup Request Body:", req.body);
+    const { name, email, password } = req.body;
     if (!name || !email || !password) {
-      alert("Please fill all fields.");
-      return;
+      return res.status(400).json({ msg: "All fields are required." });
     }
 
-    try {
-      const response = await fetch("https://thesolarax.onrender.com/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.msg || "Signup failed.");
-      }
-
-      alert("Signup successful! Now login.");
-      container.classList.remove("active"); // Switch to login form
-    } catch (error) {
-      alert("Error: " + error.message);
+    if (await User.findOne({ email })) {
+      return res.status(409).json({ msg: "Email already in use." });
     }
-  });
 
-  // ✅ Login API Call
-  loginForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = new User({ name, email, password: hashedPassword });
+    await user.save();
 
-    const email = document.getElementById("login-email").value.trim();
-    const password = document.getElementById("login-password").value.trim();
-
-    try {
-      const response = await fetch("https://thesolarax.onrender.com/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.msg || "Invalid credentials.");
-      }
-
-      localStorage.setItem("token", data.token);
-      alert("Login successful! Redirecting...");
-      window.location.href = "homepage.html";
-    } catch (error) {
-      alert("Error: " + error.message);
-    }
-  });
+    console.log("✅ User registered successfully:", email);
+    res.status(201).json({ msg: "User registered successfully" });
+  } catch (error) {
+    console.error("❌ Signup Server Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
 });
+
+// ✅ User Login
+router.post("/login", async (req, res) => {
+  try {
+    console.log("Login Request Body:", req.body);
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res.status(400).json({ msg: "All fields are required." });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(401).json({ msg: "Invalid email or password" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET || "defaultSecret",
+      { expiresIn: "7d" }
+    );
+
+    console.log("✅ Login successful:", email);
+    res.json({ msg: "Login successful!", token });
+  } catch (error) {
+    console.error("❌ Login Server Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ✅ Fetch User Profile
+router.get("/profile", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    res.json(user);
+  } catch (error) {
+    console.error("❌ Profile Fetch Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ✅ Update Password
+router.post("/update-password", verifyToken, async (req, res) => {
+  try {
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ msg: "Both old and new passwords are required" });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) return res.status(404).json({ msg: "User not found" });
+
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+    if (!isMatch) return res.status(400).json({ msg: "Old password is incorrect" });
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    await user.save();
+
+    console.log("✅ Password updated successfully for user:", req.user.id);
+    res.json({ msg: "Password updated successfully" });
+  } catch (error) {
+    console.error("❌ Password Update Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+module.exports = router;

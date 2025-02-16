@@ -3,137 +3,75 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Payments</title>
-  
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            margin: 0;
-            padding: 0;
-            text-align: center;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            padding: 15px;
-            background: #6a5acd;
-            color: white;
-            align-items: center;
-        }
-        .back-button {
-            background: white;
-            color: #6a5acd;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .payments-container {
-            max-width: 800px;
-            margin: 50px auto;
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-        }
-        .payment-status {
-            font-size: 18px;
-            color: #333;
-            margin-bottom: 20px;
-        }
-        .payment-list {
-            list-style: none;
-            padding: 0;
-        }
-        .payment-list li {
-            background: #f1f1f1;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-            text-align: left;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .back-button {
-                margin-top: 10px;
-                width: 80%;
-                text-align: center;
-            }
-            .payments-container {
-                width: 90%;
-                margin: 30px auto;
-                padding: 15px;
-            }
-            .payment-list li {
-                font-size: 14px;
-                padding: 10px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 20px;
-            }
-            .back-button {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-            .payments-container {
-                width: 95%;
-                padding: 10px;
-            }
-            .payment-list li {
-                font-size: 12px;
-                padding: 8px;
-            }
-        }
-    </style>
+    <title>Payments | zeBRO</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>Payments</h1>
-        <a href="homepage.html" class="back-button">Back to Home</a>
-    </div>
-    <div class="payments-container">
-        <h2>Your Payment Status</h2>
-        <p class="payment-status">Fetching payment details...</p>
-        <ul class="payment-list" id="payment-list"></ul>
-    </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            const token = localStorage.getItem("token");
+<header>
+    <div class="logo">zeBRO</div>
+    <nav>
+        <a href="homepage.html">Home</a>
+        <a href="plans.html">Services</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+</header>
 
-            fetch("/payment-status", {
-                headers: { "Authorization": token }
-            })
-            .then(response => response.json())
-            .then(data => {
-                const paymentList = document.getElementById("payment-list");
-                paymentList.innerHTML = ""; // Clear existing content
+<h1>Your Payment Status</h1>
+<div class="payment-container" id="payment-list">
+    <p id="payment-status">Fetching payment details...</p>
+</div>
 
-                if (data.payments && data.payments.length > 0) {
-                    data.payments.forEach(payment => {
-                        const listItem = document.createElement("li");
-                        listItem.textContent = `${payment.plan} - ₹${payment.amount} - ${payment.status}`;
-                        paymentList.appendChild(listItem);
-                    });
-                } else {
-                    paymentList.innerHTML = "<li>No payments found</li>";
-                }
-            })
-            .catch(() => {
-                document.querySelector(".payment-status").textContent = "Error fetching payment details.";
-            });
-        });
-    </script>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please log in first.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        fetch("https://thesolarax.onrender.com/payment-status", {
+            headers: { "Authorization": `Bearer ${token}` }
+        })
+        .then(response => response.json())
+        .then(data => {
+            const paymentList = document.getElementById("payment-list");
+            const paymentStatus = document.getElementById("payment-status");
+            paymentList.innerHTML = "";
+
+            if (data.payments && data.payments.length > 0) {
+                paymentStatus.textContent = "Here are your payment details:";
+                data.payments.forEach(payment => {
+                    const listItem = document.createElement("div");
+                    listItem.classList.add("payment-card");
+
+                    let statusClass = "pending";
+                    if (payment.status === "Paid") statusClass = "paid";
+                    if (payment.status === "Cancelled") statusClass = "canceled";
+
+                    listItem.innerHTML = `
+                        <div>
+                            <h3>${payment.plan}</h3>
+                            <p>₹${payment.amount / 100}</p>
+                        </div>
+                        <span class="payment-status ${statusClass}">${payment.status}</span>
+                        <span class="progress-text">${payment.completionPercentage || 0}% Completed</span>
+                    `;
+                    paymentList.appendChild(listItem);
+                });
+            } else {
+                paymentStatus.textContent = "No payments found.";
+            }
+        })
+        .catch(() => alert("Error fetching payment details."));
+    });
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    });
+</script>
+
 </body>
 </html>

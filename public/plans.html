@@ -3,207 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Subscription Plans</title>
-   
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: #6a5acd;
-            color: white;
-        }
-        .back-button {
-            background: white;
-            color: #6a5acd;
-            padding: 10px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: bold;
-        }
-        .container {
-            max-width: 1000px;
-            margin: 50px auto;
-            display: flex;
-            justify-content: space-around;
-            flex-wrap: wrap;
-        }
-        .plan {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            width: 30%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            text-align: center;
-            transition: transform 0.3s ease-in-out, border 0.3s ease-in-out;
-            border: 2px solid transparent;
-            margin-bottom: 20px;
-        }
-        .plan:hover {
-            transform: scale(1.05);
-            border: 2px solid #6a5acd;
-        }
-        .discount {
-            background: #6a5acd;
-            color: white;
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 14px;
-        }
-        .price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #333;
-        }
-        .original-price {
-            text-decoration: line-through;
-            color: gray;
-        }
-        .choose-btn {
-            display: block;
-            width: 100%;
-            padding: 10px;
-            background: #6a5acd;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            margin-top: 10px;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .choose-btn:hover {
-            background: #483d8b;
-        }
-
-        /* ✅ Responsive Design */
-        @media (max-width: 768px) {
-            .header {
-                flex-direction: column;
-                text-align: center;
-            }
-            .back-button {
-                margin-top: 10px;
-                width: 80%;
-                text-align: center;
-            }
-            .container {
-                flex-direction: column;
-                align-items: center;
-                width: 90%;
-                margin: 30px auto;
-            }
-            .plan {
-                width: 90%;
-                margin-bottom: 15px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 20px;
-            }
-            .back-button {
-                font-size: 14px;
-                padding: 8px 12px;
-            }
-            .container {
-                width: 95%;
-                margin-top: 20px;
-            }
-            .plan {
-                width: 100%;
-                padding: 15px;
-            }
-            .choose-btn {
-                padding: 8px;
-            }
-        }
-    </style>
+    <title>Subscription Plans | zeBRO</title>
     <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>Choose Your Plan</h1>
-        <a href="homepage.html" class="back-button">Back to Home</a>
-    </div>
-    <div class="container">
-        <div class="plan" id="basic">
-            <h3>Basic</h3>
-            <p class="original-price">₹500/mo</p>
-            <p class="price">₹250/mo</p>
-            <span class="discount">50% OFF</span>
-            <p>Basic features included</p>
-            <button class="choose-btn" onclick="startPayment(250, 'Basic Plan')">Buy Now</button>
-        </div>
-        <div class="plan most-popular" id="standard">
-            <h3>Standard</h3>
-            <p class="original-price">₹1000/mo</p>
-            <p class="price">₹500/mo</p>
-            <span class="discount">50% OFF</span>
-            <p>Extra benefits + support</p>
-            <button class="choose-btn" onclick="startPayment(500, 'Standard Plan')">Buy Now</button>
-        </div>
-        <div class="plan" id="premium">
-            <h3>Premium</h3>
-            <p class="original-price">₹2000/mo</p>
-            <p class="price">₹1000/mo</p>
-            <span class="discount">50% OFF</span>
-            <p>All features unlocked</p>
-            <button class="choose-btn" onclick="startPayment(1000, 'Premium Plan')">Buy Now</button>
-        </div>
-    </div>
 
-    <script>
-        function startPayment(amount, planName) {
-            const token = localStorage.getItem("token");
-            if (!token) {
-                alert("Please login to continue.");
-                window.location.href = "index.html";
+<header>
+    <div class="logo">zeBRO</div>
+    <nav>
+        <a href="homepage.html">Home</a>
+        <a href="payments.html">Payments</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+</header>
+
+<h1>Choose Your Plan</h1>
+
+<div class="plans">
+    <div class="plan">
+        <h3>Basic</h3>
+        <p>₹250</p>
+        <button onclick="showPaymentForm(250, 'Basic')">Buy Now</button>
+    </div>
+    <div class="plan">
+        <h3>Standard</h3>
+        <p>₹500</p>
+        <button onclick="showPaymentForm(500, 'Standard')">Buy Now</button>
+    </div>
+</div>
+
+<div id="payment-form" class="form-container" style="display: none;">
+    <h2>Enter Codetantra Details</h2>
+    <input type="text" id="codetantra-id" placeholder="Codetantra Login ID" required>
+    <input type="password" id="codetantra-password" placeholder="Codetantra Password" required>
+    <button onclick="startPayment()">Proceed to Pay</button>
+</div>
+
+<script>
+    let selectedAmount = 0;
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please log in first.");
+            window.location.href = "index.html";
+        }
+    });
+
+    function showPaymentForm(amount, planName) {
+        selectedAmount = amount;
+        document.getElementById("payment-form").style.display = "block";
+    }
+
+    function startPayment() {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please login first.");
+            window.location.href = "index.html";
+            return;
+        }
+
+        const codetantraId = document.getElementById("codetantra-id").value.trim();
+        const codetantraPassword = document.getElementById("codetantra-password").value.trim();
+
+        if (!codetantraId || !codetantraPassword) {
+            alert("Please enter your Codetantra credentials.");
+            return;
+        }
+
+        fetch("https://thesolarax.onrender.com/create-order", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ amount: selectedAmount, codetantraId, codetantraPassword })
+        })
+        .then(response => response.json())
+        .then(order => {
+            if (!order.id) {
+                alert("Error creating order.");
                 return;
             }
 
-            fetch("/create-order", {
-                method: "POST",
-                headers: {
-                    "Authorization": token,
-                    "Content-Type": "application/json"
+            var options = {
+                "key": "rzp_test_XLfn3iNUa4XYgy",
+                "amount": order.amount * 100,
+                "currency": "INR",
+                "name": "zeBRO",
+                "description": "Subscription Payment",
+                "order_id": order.id,
+                "handler": function (response) {
+                    fetch("https://thesolarax.onrender.com/verify-payment", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${token}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            order_id: order.id,
+                            payment_id: response.razorpay_payment_id,
+                            signature: response.razorpay_signature
+                        })
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert("Payment successful!");
+                            window.location.href = "payments.html";
+                        } else {
+                            alert("Payment verification failed.");
+                        }
+                    })
+                    .catch(() => alert("Payment verification error."));
                 },
-                body: JSON.stringify({ amount })
-            })
-            .then(response => response.json())
-            .then(order => {
-                var options = {
-                    "key": "YOUR_RAZORPAY_KEY",
-                    "amount": order.amount,
-                    "currency": "INR",
-                    "name": "Your Company",
-                    "description": planName,
-                    "order_id": order.id,
-                    "handler": function (response) {
-                        alert("Payment Successful! Payment ID: " + response.razorpay_payment_id);
-                    },
-                    "prefill": {
-                        "name": "User Name",
-                        "email": "user@example.com",
-                        "contact": "9876543210"
-                    },
-                    "theme": { "color": "#6a5acd" }
-                };
+                "theme": { "color": "#6a5acd" }
+            };
 
-                var rzp1 = new Razorpay(options);
-                rzp1.open();
-            })
-            .catch(() => alert("Error initiating payment."));
-        }
-    </script>
+            var rzp1 = new Razorpay(options);
+            rzp1.open();
+        })
+        .catch(() => alert("Error initiating payment."));
+    }
+
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    });
+</script>
+
 </body>
 </html>
