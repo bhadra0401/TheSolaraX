@@ -51,14 +51,15 @@ const verifyToken = (req, res, next) => {
 // ✅ Submit Payment Proof
 app.post("/submit-payment-proof", verifyToken, upload.single("screenshot"), async (req, res) => {
     try {
-        const { paymentId } = req.body;
-        if (!paymentId || !req.file) {
-            return res.status(400).json({ msg: "Payment ID and screenshot are required." });
+        const { paymentId, amount } = req.body;
+        if (!paymentId || !amount || !req.file) {
+            return res.status(400).json({ msg: "Payment ID, amount, and screenshot are required." });
         }
         const newPayment = new Payment({
             userId: req.userId,
             paymentId,
             screenshotUrl: `/uploads/${req.file.filename}`,
+            amount,
             status: "Pending"
         });
         await newPayment.save();
@@ -69,7 +70,7 @@ app.post("/submit-payment-proof", verifyToken, upload.single("screenshot"), asyn
     }
 });
 
-// ✅ Fetch Payment Status for Users (💡 This Fixes the 404 Error!)
+// ✅ Fetch Payment Status for Users
 app.get("/payment-status", verifyToken, async (req, res) => {
     try {
         const payments = await Payment.find({ userId: req.userId });

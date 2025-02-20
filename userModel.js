@@ -13,7 +13,4 @@ const UserSchema = new mongoose.Schema({
   role: { type: String, default: "user", enum: ["user", "admin"] }
 }, { timestamps: true });
 
-// ✅ Remove pre-save password hashing
-// ✅ Keep all previous functionality intact
-
 module.exports = mongoose.model("User", UserSchema);
