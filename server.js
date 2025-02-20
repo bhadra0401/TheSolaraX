@@ -16,17 +16,17 @@ app.use(cors({ origin: "https://verdant-zabaione-36cfc3.netlify.app" }));
 // ✅ Serve static files (Frontend)
 app.use(express.static("public"));
 
-// Serve uploaded files
+// ✅ Serve uploaded files
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// MongoDB Connection
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection error:", err));
 
 app.use("/auth", authRouter);
 
-// Multer Setup for File Uploads
+// ✅ Multer Setup for File Uploads
 const storage = multer.diskStorage({
     destination: "uploads/",
     filename: (req, file, cb) => {
@@ -35,7 +35,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Middleware for Token Verification
+// ✅ Middleware for Token Verification
 const verifyToken = (req, res, next) => {
     const token = req.header("Authorization");
     if (!token) return res.status(401).json({ msg: "Unauthorized" });
@@ -65,6 +65,17 @@ app.post("/submit-payment-proof", verifyToken, upload.single("screenshot"), asyn
         res.json({ msg: "Payment proof submitted successfully." });
     } catch (error) {
         console.error("❌ Error submitting payment proof:", error);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
+// ✅ Fetch Payment Status for Users (💡 This Fixes the 404 Error!)
+app.get("/payment-status", verifyToken, async (req, res) => {
+    try {
+        const payments = await Payment.find({ userId: req.userId });
+        res.json({ payments });
+    } catch (error) {
+        console.error("❌ Error fetching payment status:", error);
         res.status(500).json({ msg: "Server error" });
     }
 });
@@ -104,6 +115,6 @@ app.post("/admin/reject-payment/:id", verifyToken, async (req, res) => {
     }
 });
 
-// Start Server
+// ✅ Start Server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
