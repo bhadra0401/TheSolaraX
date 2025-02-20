@@ -73,6 +73,7 @@
 
         const formData = new FormData();
         formData.append("paymentId", paymentId);
+        formData.append("amount", selectedAmount); // ✅ Ensure amount is included
         formData.append("screenshot", fileInput.files[0]);
 
         fetch("https://thesolarax.onrender.com/submit-payment-proof", {
