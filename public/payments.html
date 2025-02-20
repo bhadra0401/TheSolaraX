@@ -60,6 +60,7 @@
         document.getElementById("qr-code-container").style.display = "block";
         document.getElementById("payment-proof-form").style.display = "block";
     }
+let selectedAmount = 0; // ✅ Declare globally
 
     function submitPaymentProof() {
         const token = localStorage.getItem("token");
