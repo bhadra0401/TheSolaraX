@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscription Plans | zeBRO</title>
-    <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -23,13 +23,18 @@
 <div class="plans">
     <div class="plan">
         <h3>Basic</h3>
-        <p>₹250</p>
-        <button onclick="showPaymentForm(250, 'Basic')">Buy Now</button>
+        <p>₹1599</p>
+        <button onclick="showPaymentForm(1599, 'Basic')">Buy Now</button>
     </div>
     <div class="plan">
         <h3>Standard</h3>
-        <p>₹500</p>
-        <button onclick="showPaymentForm(500, 'Standard')">Buy Now</button>
+        <p>₹599</p>
+        <button onclick="showPaymentForm(599, 'Standard')">Buy Now</button>
+    </div>
+    <div class="plan">
+        <h3>Premium</h3>
+        <p>₹2199</p>
+        <button onclick="showPaymentForm(2199, 'Premium')">Buy Now</button>
     </div>
 </div>
 
@@ -37,100 +42,38 @@
     <h2>Enter Codetantra Details</h2>
     <input type="text" id="codetantra-id" placeholder="Codetantra Login ID" required>
     <input type="password" id="codetantra-password" placeholder="Codetantra Password" required>
-    <button onclick="startPayment()">Proceed to Pay</button>
+    <button onclick="generateQRCode()">Proceed to Pay</button>
+</div>
+
+<div id="qr-code-container" style="display: none; text-align: center;">
+    <h3>Scan the QR Code to Pay</h3>
+    <div id="qrcode"></div>
+    <p>After payment, submit your proof below.</p>
 </div>
 
 <script>
     let selectedAmount = 0;
-
-    document.addEventListener("DOMContentLoaded", function () {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            alert("Please log in first.");
-            window.location.href = "index.html";
-        }
-    });
 
     function showPaymentForm(amount, planName) {
         selectedAmount = amount;
         document.getElementById("payment-form").style.display = "block";
     }
 
-    function startPayment() {
-        const token = localStorage.getItem("token");
-        if (!token) {
-            alert("Please login first.");
-            window.location.href = "index.html";
-            return;
-        }
-
+    function generateQRCode() {
         const codetantraId = document.getElementById("codetantra-id").value.trim();
         const codetantraPassword = document.getElementById("codetantra-password").value.trim();
-
+        
         if (!codetantraId || !codetantraPassword) {
             alert("Please enter your Codetantra credentials.");
             return;
         }
-
-        fetch("https://thesolarax.onrender.com/create-order", {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ amount: selectedAmount, codetantraId, codetantraPassword })
-        })
-        .then(response => response.json())
-        .then(order => {
-            if (!order.id) {
-                alert("Error creating order.");
-                return;
-            }
-
-            var options = {
-                "key": "rzp_test_XLfn3iNUa4XYgy",
-                "amount": order.amount * 100,
-                "currency": "INR",
-                "name": "zeBRO",
-                "description": "Subscription Payment",
-                "order_id": order.id,
-                "handler": function (response) {
-                    fetch("https://thesolarax.onrender.com/verify-payment", {
-                        method: "POST",
-                        headers: {
-                            "Authorization": `Bearer ${token}`,
-                            "Content-Type": "application/json"
-                        },
-                        body: JSON.stringify({
-                            order_id: order.id,
-                            payment_id: response.razorpay_payment_id,
-                            signature: response.razorpay_signature
-                        })
-                    })
-                    .then(res => res.json())
-                    .then(data => {
-                        if (data.success) {
-                            alert("Payment successful!");
-                            window.location.href = "payments.html";
-                        } else {
-                            alert("Payment verification failed.");
-                        }
-                    })
-                    .catch(() => alert("Payment verification error."));
-                },
-                "theme": { "color": "#6a5acd" }
-            };
-
-            var rzp1 = new Razorpay(options);
-            rzp1.open();
-        })
-        .catch(() => alert("Error initiating payment."));
+        
+        const qr = qrcode(0, 'L');
+        qr.addData(`upi://pay?pa=your-upi-id@upi&pn=zeBRO&am=${selectedAmount}`);
+        qr.make();
+        document.getElementById("qrcode").innerHTML = qr.createImgTag();
+        document.getElementById("qr-code-container").style.display = "block";
     }
-
-    document.getElementById("logoutBtn").addEventListener("click", function () {
-        localStorage.removeItem("token");
-        window.location.href = "index.html";
-    });
 </script>
 
 </body>

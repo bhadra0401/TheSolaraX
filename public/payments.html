@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments | zeBRO</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
 </head>
 <body>
 
@@ -17,10 +18,28 @@
     </nav>
 </header>
 
-<h1>Your Payment Status</h1>
-<div class="payment-container" id="payment-list">
-    <p id="payment-status">Fetching payment details...</p>
+<h1>Make a Payment</h1>
+<div class="payment-options">
+    <button onclick="generateQRCode(1599)">Pay ₹1599</button>
+    <button onclick="generateQRCode(599)">Pay ₹599</button>
+    <button onclick="generateQRCode(2199)">Pay ₹2199</button>
 </div>
+
+<div id="qr-code-container" style="display: none; text-align: center;">
+    <h3>Scan the QR Code to Pay</h3>
+    <div id="qrcode"></div>
+    <p>After payment, submit your proof below.</p>
+</div>
+
+<div id="payment-proof-form" style="display: none;">
+    <h2>Submit Payment Proof</h2>
+    <input type="text" id="payment-id" placeholder="Enter Payment ID" required>
+    <input type="file" id="screenshot" accept="image/*" required>
+    <button onclick="submitPaymentProof()">Submit Proof</button>
+</div>
+
+<h2>Your Payment Status</h2>
+<div id="payment-list">Fetching payment details...</div>
 
 <script>
     document.addEventListener("DOMContentLoaded", function () {
@@ -30,47 +49,62 @@
             window.location.href = "index.html";
             return;
         }
+        fetchPayments();
+    });
 
+    function generateQRCode(amount) {
+        const qr = qrcode(0, 'L');
+        qr.addData(`upi://pay?pa=your-upi-id@upi&pn=zeBRO&am=${amount}`);
+        qr.make();
+        document.getElementById("qrcode").innerHTML = qr.createImgTag();
+        document.getElementById("qr-code-container").style.display = "block";
+        document.getElementById("payment-proof-form").style.display = "block";
+    }
+
+    function submitPaymentProof() {
+        const token = localStorage.getItem("token");
+        const paymentId = document.getElementById("payment-id").value.trim();
+        const fileInput = document.getElementById("screenshot");
+
+        if (!paymentId || !fileInput.files.length) {
+            alert("Please enter Payment ID and upload a screenshot.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("paymentId", paymentId);
+        formData.append("screenshot", fileInput.files[0]);
+
+        fetch("https://thesolarax.onrender.com/submit-payment-proof", {
+            method: "POST",
+            headers: { "Authorization": `Bearer ${token}` },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.msg);
+            fetchPayments();
+        })
+        .catch(() => alert("Error submitting proof."));
+    }
+
+    function fetchPayments() {
+        const token = localStorage.getItem("token");
         fetch("https://thesolarax.onrender.com/payment-status", {
             headers: { "Authorization": `Bearer ${token}` }
         })
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             const paymentList = document.getElementById("payment-list");
-            const paymentStatus = document.getElementById("payment-status");
             paymentList.innerHTML = "";
-
-            if (data.payments && data.payments.length > 0) {
-                paymentStatus.textContent = "Here are your payment details:";
-                data.payments.forEach(payment => {
-                    const listItem = document.createElement("div");
-                    listItem.classList.add("payment-card");
-
-                    let statusClass = "pending";
-                    if (payment.status === "Paid") statusClass = "paid";
-                    if (payment.status === "Cancelled") statusClass = "canceled";
-
-                    listItem.innerHTML = `
-                        <div>
-                            <h3>${payment.plan}</h3>
-                            <p>₹${payment.amount / 100}</p>
-                        </div>
-                        <span class="payment-status ${statusClass}">${payment.status}</span>
-                        <span class="progress-text">${payment.completionPercentage || 0}% Completed</span>
-                    `;
-                    paymentList.appendChild(listItem);
-                });
-            } else {
-                paymentStatus.textContent = "No payments found.";
-            }
+            data.payments.forEach(payment => {
+                const div = document.createElement("div");
+                div.innerHTML = `<p>Plan: ${payment.amount} | Status: ${payment.status}</p>`;
+                paymentList.appendChild(div);
+            });
         })
-        .catch(() => alert("Error fetching payment details."));
-    });
-
-    document.getElementById("logoutBtn").addEventListener("click", function () {
-        localStorage.removeItem("token");
-        window.location.href = "index.html";
-    });
+        .catch(() => alert("Error fetching payments."));
+    }
 </script>
 
 </body>

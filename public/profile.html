@@ -4,98 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Profile | zeBRO</title>
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            text-align: center;
-            background: #f4f4f4;
-        }
-        .header {
-            background: linear-gradient(135deg, #6a5acd, #483d8b);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
-        }
-        .back-button {
-            background: white;
-            color: #6a5acd;
-            padding: 10px 15px;
-            border-radius: 6px;
-            font-weight: 500;
-            cursor: pointer;
-            text-decoration: none;
-            transition: 0.3s;
-        }
-        .back-button:hover {
-            background: #ddd;
-        }
-        .profile-container {
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
-            padding: 30px;
-            border-radius: 12px;
-            box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
-            text-align: center;
-        }
-        .profile-icon {
-            font-size: 100px;
-            color: #6a5acd;
-            margin-bottom: 15px;
-        }
-        .profile-info h2 {
-            margin: 10px 0;
-            font-size: 24px;
-        }
-        .profile-info p {
-            color: gray;
-            font-size: 16px;
-        }
-        .forgot-password {
-            display: inline-block;
-            margin-top: 15px;
-            color: #000000;
-            text-decoration: none;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-        #reset-password-section {
-            display: none;
-            margin-top: 20px;
-        }
-        input {
-            width: 100%;
-            padding: 12px;
-            margin-top: 10px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-        }
-        button {
-            width: 100%;
-            background: #6a5acd;
-            color: white;
-            border: none;
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-        button:hover {
-            background: #483d8b;
-            transform: scale(1.05);
-        }
-    </style>
 </head>
 <body>
     <div class="header">
@@ -109,7 +18,7 @@
             <p id="useremail">Loading...</p>
             <button class="forgot-password" onclick="toggleResetPassword()">Change Password</button>
         </div>
-        <div id="reset-password-section">
+        <div id="reset-password-section" style="display: none;">
             <input type="password" id="old-password" placeholder="Enter old password">
             <input type="password" id="new-password" placeholder="Enter new password">
             <button onclick="updatePassword()">Update Password</button>
@@ -140,10 +49,12 @@
                 window.location.href = "index.html";
             });
         });
+
         function toggleResetPassword() {
             const resetSection = document.getElementById("reset-password-section");
             resetSection.style.display = resetSection.style.display === "none" || resetSection.style.display === "" ? "block" : "none";
         }
+
         function updatePassword() {
             const oldPassword = document.getElementById("old-password").value.trim();
             const newPassword = document.getElementById("new-password").value.trim();

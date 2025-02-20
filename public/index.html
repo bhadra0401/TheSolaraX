@@ -21,6 +21,7 @@
         <p class="toggle-text">
             <span id="toggle-auth">Don't have an account? <strong>Sign Up</strong></span>
         </p>
+        <p class="forgot-password"><a href="forgot-password.html">Forgot Password?</a></p>
     </div>
 </div>
 
@@ -77,6 +78,7 @@
             alert(data.msg);
             if (!isSignup) {
                 localStorage.setItem("token", data.token);
+                localStorage.setItem("role", data.role);
                 window.location.href = "homepage.html";
             }
         } catch (error) {
