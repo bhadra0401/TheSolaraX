@@ -1,5 +1,4 @@
 const express = require("express");
-const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./userModel");
 
@@ -12,7 +11,7 @@ const verifyToken = (req, res, next) => {
     if (!token) return res.status(401).json({ msg: "Unauthorized, No Token" });
 
     token = token.replace("Bearer ", "");
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret"); // ✅ Prevent undefined secret
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
     req.user = decoded;
     next();
   } catch (error) {
@@ -21,7 +20,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// ✅ User Signup
+// ✅ User Signup (Without Hashing)
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -33,8 +32,7 @@ router.post("/signup", async (req, res) => {
       return res.status(409).json({ msg: "Email already in use." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({ name, email, password: hashedPassword, role: role || "user" });
+    const user = new User({ name, email, password, role: role || "user" });
     await user.save();
 
     console.log("✅ User registered successfully:", email);
@@ -45,7 +43,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// ✅ User Login with Debugging Logs
+// ✅ User Login (Without Hashing)
 router.post("/login", async (req, res) => {
   try {
     console.log("📌 Login Attempt:", req.body.email);
@@ -56,14 +54,8 @@ router.post("/login", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    if (!user) {
-      console.log("❌ User not found:", email);
-      return res.status(401).json({ msg: "Invalid email or password" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log("❌ Password mismatch for:", email);
+    if (!user || user.password !== password) {
+      console.log("❌ Invalid email or password for:", email);
       return res.status(401).json({ msg: "Invalid email or password" });
     }
 
@@ -81,21 +73,15 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ✅ Admin Login with Debugging Logs
+// ✅ Admin Login (Without Hashing)
 router.post("/admin/login", async (req, res) => {
   try {
     console.log("📌 Admin Login Attempt:", req.body.email);
 
     const { email, password } = req.body;
     const user = await User.findOne({ email, role: "admin" });
-    if (!user) {
-      console.log("❌ Admin user not found:", email);
-      return res.status(401).json({ msg: "Invalid admin credentials" });
-    }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      console.log("❌ Admin Password mismatch for:", email);
+    if (!user || user.password !== password) {
+      console.log("❌ Invalid admin credentials for:", email);
       return res.status(401).json({ msg: "Invalid admin credentials" });
     }
 
