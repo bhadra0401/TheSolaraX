@@ -1,4 +1,5 @@
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("./userModel");
 
@@ -15,7 +16,6 @@ const verifyToken = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (error) {
-    console.error("❌ Token Verification Failed:", error.message);
     res.status(401).json({ msg: "Invalid or expired token" });
   }
 };
@@ -23,7 +23,7 @@ const verifyToken = (req, res, next) => {
 // ✅ User Signup
 router.post("/signup", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { name, email, password, role } = req.body;
     if (!name || !email || !password) {
       return res.status(400).json({ msg: "All fields are required." });
     }
@@ -32,13 +32,12 @@ router.post("/signup", async (req, res) => {
       return res.status(409).json({ msg: "Email already in use." });
     }
 
-    const user = new User({ name, email, password }); // ✅ Store plain password
+    const hashedPassword = await bcrypt.hash(password, 12);
+    const user = new User({ name, email, password: hashedPassword, role: role || "user" });
     await user.save();
 
-    console.log("✅ User registered successfully:", email);
     res.status(201).json({ msg: "User registered successfully" });
   } catch (error) {
-    console.error("❌ Signup Server Error:", error);
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -51,20 +50,40 @@ router.post("/login", async (req, res) => {
       return res.status(400).json({ msg: "All fields are required." });
     }
 
-    console.log("📌 Login Attempt:", email);
-
-    const user = await User.findOne({ email: email.toLowerCase() });
-    if (!user || user.password !== password) {
-      console.log("❌ Invalid credentials for:", email);
+    const user = await User.findOne({ email });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ msg: "Invalid email or password" });
     }
 
-    console.log("✅ Login Successful:", user.email);
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: user.role },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
 
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    res.json({ msg: "Login successful!", token });
+    res.json({ msg: "Login successful!", token, role: user.role });
   } catch (error) {
-    console.error("❌ Login Server Error:", error);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ✅ Admin Login
+router.post("/admin/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await User.findOne({ email, role: "admin" });
+    if (!user || !(await bcrypt.compare(password, user.password))) {
+      return res.status(401).json({ msg: "Invalid admin credentials" });
+    }
+
+    const token = jwt.sign(
+      { id: user._id, email: user.email, role: "admin" },
+      process.env.JWT_SECRET,
+      { expiresIn: "7d" }
+    );
+
+    res.json({ msg: "Admin login successful!", token });
+  } catch (error) {
     res.status(500).json({ msg: "Server error" });
   }
 });
@@ -77,31 +96,6 @@ router.get("/profile", verifyToken, async (req, res) => {
 
     res.json(user);
   } catch (error) {
-    console.error("❌ Profile Fetch Error:", error);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
-// ✅ Update Password
-router.post("/update-password", verifyToken, async (req, res) => {
-  try {
-    const { oldPassword, newPassword } = req.body;
-    if (!oldPassword || !newPassword) {
-      return res.status(400).json({ msg: "Both old and new passwords are required" });
-    }
-
-    const user = await User.findById(req.user.id);
-    if (!user || user.password !== oldPassword) {
-      return res.status(400).json({ msg: "Old password is incorrect" });
-    }
-
-    user.password = newPassword;
-    await user.save();
-
-    console.log("✅ Password updated successfully for user:", req.user.id);
-    res.json({ msg: "Password updated successfully" });
-  } catch (error) {
-    console.error("❌ Password Update Error:", error);
     res.status(500).json({ msg: "Server error" });
   }
 });
