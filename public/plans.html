@@ -69,7 +69,7 @@
         }
         
         const qr = qrcode(0, 'L');
-        qr.addData(`upi://pay?pa=your-upi-id@upi&pn=zeBRO&am=${selectedAmount}`);
+        qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${selectedAmount}`);
         qr.make();
         document.getElementById("qrcode").innerHTML = qr.createImgTag();
         document.getElementById("qr-code-container").style.display = "block";
