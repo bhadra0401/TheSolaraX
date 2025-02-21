@@ -50,14 +50,24 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         console.log("📌 Payment Submission Attempt:", req.body);
         console.log("📌 Uploaded File Details:", req.file);
 
+        const token = req.header("Authorization").replace("Bearer ", "");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
+
         const { codetantraId, codetantraPassword, paymentId, amount } = req.body;
         if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file) {
             console.error("❌ Missing Fields:", { codetantraId, codetantraPassword, paymentId, amount, file: req.file });
             return res.status(400).json({ msg: "All fields are required." });
         }
 
-        // ✅ Save payment details in the database
+        // ✅ Find the user's email from the database
+        const user = await User.findById(decoded.id);
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        // ✅ Save payment with user's email
         const newPayment = new Payment({
+            email: user.email,  // ✅ Store the user's email
             codetantraId,
             codetantraPassword,
             paymentId,
@@ -82,7 +92,8 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             from: process.env.EMAIL,
             to: process.env.OWNER_EMAIL,
             subject: "New Payment Submission",
-            html: `<p><strong>Codetantra ID:</strong> ${codetantraId}</p>
+            html: `<p><strong>User Email:</strong> ${user.email}</p>
+                   <p><strong>Codetantra ID:</strong> ${codetantraId}</p>
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
                    <p><strong>Amount:</strong> ₹${amount}</p>
@@ -111,7 +122,7 @@ app.get("/payment-status", async (req, res) => {
         }
 
         console.log("📌 Fetching payments for:", user.email); // ✅ Log correct email
-        const userPayments = await Payment.find({ codetantraId: user.email }); // ✅ Use the correct email field
+        const userPayments = await Payment.find({ email: user.email }); // ✅ Use email instead of codetantraId
 
         console.log("📌 User Payments Found:", userPayments); // ✅ Log the fetched payments
         res.json({ payments: userPayments });
@@ -121,7 +132,6 @@ app.get("/payment-status", async (req, res) => {
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
-
 
 
 // ✅ Root Route (For Testing)
