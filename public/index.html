@@ -56,7 +56,9 @@
             return;
         }
 
-        const endpoint = isSignup ? "/auth/signup" : "/auth/login";
+        const backendUrl = "https://thesolarax.onrender.com";
+        const endpoint = isSignup ? `${backendUrl}/auth/signup` : `${backendUrl}/auth/login`;
+
         const requestData = isSignup ? { name, email, password } : { email, password };
 
         submitBtn.disabled = true;
