@@ -103,7 +103,7 @@
         .catch(() => alert("Error submitting proof."));
     }
 
-   function fetchPayments() {
+    function fetchPayments() {
     const token = localStorage.getItem("token");
 
     fetch(`${backendUrl}/payment-status`, {
@@ -111,19 +111,31 @@
     })
     .then(res => res.json())
     .then(data => {
-        const userEmail = localStorage.getItem("userEmail"); // Get logged-in user email
         const paymentList = document.getElementById("payment-list");
-        paymentList.innerHTML = "";
+        paymentList.innerHTML = ""; // ✅ Clear previous entries
 
-        data.payments
-            .filter(payment => payment.codetantraId === userEmail) // ✅ Filter payments
-            .forEach(payment => {
-                const div = document.createElement("div");
-                div.innerHTML = `<p>Plan: ₹${payment.amount} | Status: ${payment.status}</p>`;
-                paymentList.appendChild(div);
-            });
+        console.log("📌 Received Payments Data:", data.payments); // ✅ Debugging log
+
+        if (data.payments.length === 0) {
+            paymentList.innerHTML = "<p>No payments found.</p>"; // ✅ Show a message if no payments exist
+            return;
+        }
+
+        data.payments.forEach(payment => {
+            const div = document.createElement("div");
+            div.innerHTML = `
+                <p><strong>Plan:</strong> ₹${payment.amount || "N/A"} | <strong>Status:</strong> ${payment.status || "Pending"}</p>
+                <p><strong>Payment ID:</strong> ${payment.paymentId || "N/A"}</p>
+                <p><strong>Screenshot:</strong> <a href="${backendUrl}${payment.screenshotUrl}" target="_blank">View Screenshot</a></p>
+                <hr>
+            `;
+            paymentList.appendChild(div);
+        });
     })
-    .catch(() => alert("Error fetching payments."));
+    .catch(error => {
+        console.error("❌ Error fetching payments:", error);
+        alert("Error fetching payments.");
+    });
 }
 
 </script>
