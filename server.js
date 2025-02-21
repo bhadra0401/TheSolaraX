@@ -8,6 +8,7 @@ const path = require("path");
 const Payment = require("./paymentModel");
 const User = require("./userModel");
 const authRouter = require("./authRouter");
+const jwt = require("jsonwebtoken"); // ✅ Add this line
 
 const app = express();
 app.use(express.json());
@@ -99,14 +100,15 @@ app.get("/payment-status", async (req, res) => {
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
 
-        const userPayments = await Payment.find({ codetantraId: decoded.email }); // ✅ Filter by logged-in user
+        const userPayments = await Payment.find({ codetantraId: decoded.email }); // ✅ Show only logged-in user's payments
         res.json({ payments: userPayments });
 
     } catch (error) {
         console.error("❌ Error fetching payments:", error);
-        res.status(500).json({ msg: "Server error" });
+        res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
 
 
 // ✅ Root Route (For Testing)
