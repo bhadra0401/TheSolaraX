@@ -9,8 +9,7 @@ const UserSchema = new mongoose.Schema({
     lowercase: true, 
     match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/ 
   },
-  password: { type: String, required: true }, // ✅ Store original password without hashing
-  role: { type: String, default: "user", enum: ["user", "admin"] }
+  password: { type: String, required: true }, // ✅ Stored without hashing
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", UserSchema);

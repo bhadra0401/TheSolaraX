@@ -73,32 +73,6 @@ router.post("/login", async (req, res) => {
   }
 });
 
-// ✅ Admin Login (Without Hashing)
-router.post("/admin/login", async (req, res) => {
-  try {
-    console.log("📌 Admin Login Attempt:", req.body.email);
-
-    const { email, password } = req.body;
-    const user = await User.findOne({ email, role: "admin" });
-    if (!user || user.password !== password) {
-      console.log("❌ Invalid admin credentials for:", email);
-      return res.status(401).json({ msg: "Invalid admin credentials" });
-    }
-
-    const token = jwt.sign(
-      { id: user._id, email: user.email, role: "admin" },
-      process.env.JWT_SECRET || "defaultSecret",
-      { expiresIn: "7d" }
-    );
-
-    console.log("✅ Admin login successful:", email);
-    res.json({ msg: "Admin login successful!", token });
-  } catch (error) {
-    console.error("❌ Admin Login Server Error:", error);
-    res.status(500).json({ msg: "Server error" });
-  }
-});
-
 // ✅ Fetch User Profile
 router.get("/profile", verifyToken, async (req, res) => {
   try {
