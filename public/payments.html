@@ -33,6 +33,8 @@
 
 <div id="payment-proof-form" style="display: none;">
     <h2>Submit Payment Proof</h2>
+    <input type="text" id="codetantra-id" placeholder="Enter Codetantra ID" required>
+    <input type="password" id="codetantra-password" placeholder="Enter Codetantra Password" required>
     <input type="text" id="payment-id" placeholder="Enter Payment ID" required>
     <input type="file" id="screenshot" accept="image/*" required>
     <button onclick="submitPaymentProof()">Submit Proof</button>
@@ -42,7 +44,7 @@
 <div id="payment-list">Fetching payment details...</div>
 
 <script>
-    const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
+    const backendUrl = "https://thesolarax.onrender.com";
 
     document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("token");
@@ -69,15 +71,19 @@
 
     function submitPaymentProof() {
         const token = localStorage.getItem("token");
+        const codetantraId = document.getElementById("codetantra-id").value.trim();
+        const codetantraPassword = document.getElementById("codetantra-password").value.trim();
         const paymentId = document.getElementById("payment-id").value.trim();
         const fileInput = document.getElementById("screenshot");
 
-        if (!paymentId || !fileInput.files.length) {
-            alert("Please enter Payment ID and upload a screenshot.");
+        if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length) {
+            alert("Please fill all fields before submitting.");
             return;
         }
 
         const formData = new FormData();
+        formData.append("codetantraId", codetantraId);
+        formData.append("codetantraPassword", codetantraPassword);
         formData.append("paymentId", paymentId);
         formData.append("amount", selectedAmount);
         formData.append("screenshot", fileInput.files[0]);
