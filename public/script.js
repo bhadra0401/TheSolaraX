@@ -1,3 +1,5 @@
+const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
+
 document.addEventListener("DOMContentLoaded", function () {
   const userToken = localStorage.getItem("token");
 
@@ -10,12 +12,15 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function fetchUserProfile() {
   const token = localStorage.getItem("token");
-  fetch("/auth/profile", {
+  fetch(`${backendUrl}/auth/profile`, {
       headers: { "Authorization": `Bearer ${token}` }
   })
   .then(response => {
-      if (!response.ok) {
-          throw new Error("Session expired. Please log in again.");
+      if (response.status === 401) {
+          alert("Session expired. Please log in again.");
+          localStorage.removeItem("token");
+          window.location.href = "index.html";
+          return;
       }
       return response.json();
   })
@@ -23,7 +28,7 @@ function fetchUserProfile() {
       document.getElementById("profileLink").textContent = data.name || "Profile";
   })
   .catch(error => {
-      alert(error.message);
+      alert("Error fetching profile. Please try again.");
       localStorage.removeItem("token");
       window.location.href = "index.html";
   });

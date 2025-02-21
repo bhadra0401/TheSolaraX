@@ -25,6 +25,7 @@
 </div>
 
 <script>
+    const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
     const formTitle = document.getElementById("form-title");
     const authForm = document.getElementById("auth-form");
     const nameInput = document.getElementById("name");
@@ -56,9 +57,7 @@
             return;
         }
 
-        const backendUrl = "https://thesolarax.onrender.com";
         const endpoint = isSignup ? `${backendUrl}/auth/signup` : `${backendUrl}/auth/login`;
-
         const requestData = isSignup ? { name, email, password } : { email, password };
 
         submitBtn.disabled = true;
