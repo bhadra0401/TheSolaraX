@@ -1,6 +1,5 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 const User = require("./userModel");
 
 const router = express.Router();
@@ -21,7 +20,7 @@ const verifyToken = (req, res, next) => {
   }
 };
 
-// ✅ User Signup (With Password Hashing)
+// ✅ User Signup (Without Hashing)
 router.post("/signup", async (req, res) => {
   try {
     const { name, email, password } = req.body;
@@ -33,8 +32,7 @@ router.post("/signup", async (req, res) => {
       return res.status(409).json({ msg: "Email already in use." });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ name, email, password: hashedPassword });
+    const user = new User({ name, email, password }); // ❌ No Hashing
     await user.save();
 
     console.log("✅ User registered successfully:", email);
@@ -45,7 +43,7 @@ router.post("/signup", async (req, res) => {
   }
 });
 
-// ✅ User Login (With Password Hashing)
+// ✅ User Login (Without Hashing)
 router.post("/login", async (req, res) => {
   try {
     console.log("📌 Login Attempt:", req.body.email);
@@ -56,7 +54,7 @@ router.post("/login", async (req, res) => {
     }
 
     const user = await User.findOne({ email });
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || user.password !== password) {
       console.log("❌ Invalid email or password for:", email);
       return res.status(401).json({ msg: "Invalid email or password" });
     }
