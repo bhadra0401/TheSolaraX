@@ -70,38 +70,39 @@
     }
 
     function submitPaymentProof() {
-        const token = localStorage.getItem("token");
-        const codetantraId = document.getElementById("codetantra-id").value.trim();
-        const codetantraPassword = document.getElementById("codetantra-password").value.trim();
-        const paymentId = document.getElementById("payment-id").value.trim();
-        const fileInput = document.getElementById("screenshot");
+    const token = localStorage.getItem("token");
+    const codetantraId = document.getElementById("codetantra-id").value.trim();
+    const codetantraPassword = document.getElementById("codetantra-password").value.trim();
+    const paymentId = document.getElementById("payment-id").value.trim();
+    const fileInput = document.getElementById("screenshot");
 
-        if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length) {
-            alert("Please fill all fields before submitting.");
-            return;
-        }
+    let selectedAmount = localStorage.getItem("selectedAmount"); // ✅ Ensure amount is retrieved
 
-        const formData = new FormData();
-        formData.append("codetantraId", codetantraId);
-        formData.append("codetantraPassword", codetantraPassword);
-        formData.append("paymentId", paymentId);
-        formData.append("amount", selectedAmount);
-        formData.append("screenshot", fileInput.files[0]);
-
-        console.log("📌 Sending payment proof:", Object.fromEntries(formData)); // ✅ Debugging log
-
-        fetch(`${backendUrl}/submit-payment`, {
-            method: "POST",
-            headers: { "Authorization": `Bearer ${token}` },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(data => {
-            alert(data.msg);
-            fetchPayments();
-        })
-        .catch(() => alert("Error submitting proof."));
+    if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length || !selectedAmount) {
+        alert("Please fill all fields before submitting.");
+        return;
     }
+
+    const formData = new FormData();
+    formData.append("codetantraId", codetantraId);
+    formData.append("codetantraPassword", codetantraPassword);
+    formData.append("paymentId", paymentId);
+    formData.append("amount", selectedAmount);  // ✅ Include amount in request
+    formData.append("screenshot", fileInput.files[0]);
+
+    fetch(`${backendUrl}/submit-payment`, {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.msg);
+        fetchPayments();
+    })
+    .catch(() => alert("Error submitting proof."));
+}
+
 
     function fetchPayments() {
     const token = localStorage.getItem("token");
