@@ -13,11 +13,17 @@ function fetchUserProfile() {
   fetch("/auth/profile", {
       headers: { "Authorization": `Bearer ${token}` }
   })
-  .then(response => response.json())
+  .then(response => {
+      if (!response.ok) {
+          throw new Error("Session expired. Please log in again.");
+      }
+      return response.json();
+  })
   .then(data => {
       document.getElementById("profileLink").textContent = data.name || "Profile";
   })
-  .catch(() => {
+  .catch(error => {
+      alert(error.message);
       localStorage.removeItem("token");
       window.location.href = "index.html";
   });

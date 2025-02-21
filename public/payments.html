@@ -52,7 +52,11 @@
         fetchPayments();
     });
 
+    let selectedAmount = localStorage.getItem("selectedAmount") || 0; // ✅ Fix: Retrieve selected amount
+
     function generateQRCode(amount) {
+        selectedAmount = amount;
+        localStorage.setItem("selectedAmount", amount);
         const qr = qrcode(0, 'L');
         qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
         qr.make();
@@ -60,8 +64,6 @@
         document.getElementById("qr-code-container").style.display = "block";
         document.getElementById("payment-proof-form").style.display = "block";
     }
-
-    let selectedAmount = 0; // ✅ Declare globally
 
     function submitPaymentProof() {
         const token = localStorage.getItem("token");
@@ -75,10 +77,10 @@
 
         const formData = new FormData();
         formData.append("paymentId", paymentId);
-        formData.append("amount", selectedAmount); // ✅ Ensure amount is included
+        formData.append("amount", selectedAmount);
         formData.append("screenshot", fileInput.files[0]);
 
-        fetch("https://thesolarax.onrender.com/submit-payment-proof", {
+        fetch("/submit-payment", {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` },
             body: formData
@@ -93,7 +95,7 @@
 
     function fetchPayments() {
         const token = localStorage.getItem("token");
-        fetch("https://thesolarax.onrender.com/payment-status", {
+        fetch("/payment-status", {
             headers: { "Authorization": `Bearer ${token}` }
         })
         .then(res => res.json())
