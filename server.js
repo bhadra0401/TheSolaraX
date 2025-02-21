@@ -100,7 +100,17 @@ app.get("/payment-status", async (req, res) => {
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
 
-        const userPayments = await Payment.find({ codetantraId: decoded.email }); // ✅ Show only logged-in user's payments
+        console.log("📌 Decoded Token:", decoded); // ✅ Debugging log
+
+        const user = await User.findById(decoded.id); // ✅ Get the user from DB
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        console.log("📌 Fetching payments for:", user.email); // ✅ Log correct email
+        const userPayments = await Payment.find({ codetantraId: user.email }); // ✅ Use the correct email field
+
+        console.log("📌 User Payments Found:", userPayments); // ✅ Log the fetched payments
         res.json({ payments: userPayments });
 
     } catch (error) {
