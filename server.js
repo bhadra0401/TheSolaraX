@@ -11,7 +11,12 @@ const authRouter = require("./authRouter");
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: "https://verdant-zabaione-36cfc3.netlify.app", // Allow requests from your frontend
+    methods: "GET,POST,PUT,DELETE",
+    allowedHeaders: "Content-Type,Authorization"
+}));
+
 
 // ✅ Serve static files (Frontend)
 app.use(express.static("public"));
