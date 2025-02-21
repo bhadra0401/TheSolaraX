@@ -117,7 +117,7 @@
         console.log("📌 Received Payments Data:", data.payments); // ✅ Debugging log
 
         if (data.payments.length === 0) {
-            paymentList.innerHTML = "<p>No payments found.</p>"; // ✅ Show a message if no payments exist
+            paymentList.innerHTML = "<p>No payments found.</p>";
             return;
         }
 
@@ -137,6 +137,7 @@
         alert("Error fetching payments.");
     });
 }
+
 
 </script>
 
