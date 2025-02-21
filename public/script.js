@@ -1,19 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
   const userToken = localStorage.getItem("token");
-  const adminToken = localStorage.getItem("adminToken");
-  const isAdmin = localStorage.getItem("role") === "admin";
 
   if (userToken) {
       fetchUserProfile();
-  }
-  if (adminToken && isAdmin) {
-      fetchAdminDashboard();
+  } else {
+      window.location.href = "index.html";
   }
 });
 
 function fetchUserProfile() {
   const token = localStorage.getItem("token");
-  fetch("https://thesolarax.onrender.com/auth/profile", {
+  fetch("/auth/profile", {
       headers: { "Authorization": `Bearer ${token}` }
   })
   .then(response => response.json())
@@ -26,25 +23,8 @@ function fetchUserProfile() {
   });
 }
 
-function fetchAdminDashboard() {
-  const token = localStorage.getItem("adminToken");
-  fetch("https://thesolarax.onrender.com/admin/payment-requests", {
-      headers: { "Authorization": `Bearer ${token}` }
-  })
-  .then(response => response.json())
-  .then(data => {
-      console.log("Admin Dashboard Data:", data);
-  })
-  .catch(() => {
-      localStorage.removeItem("adminToken");
-      window.location.href = "index.html";
-  });
-}
-
 function logout() {
   localStorage.removeItem("token");
-  localStorage.removeItem("adminToken");
-  localStorage.removeItem("role");
   window.location.href = "index.html";
 }
 

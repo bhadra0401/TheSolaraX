@@ -21,7 +21,6 @@
         <p class="toggle-text">
             <span id="toggle-auth">Don't have an account? <strong>Sign Up</strong></span>
         </p>
-        <p class="forgot-password"><a href="forgot-password.html">Forgot Password?</a></p>
     </div>
 </div>
 
@@ -57,7 +56,7 @@
             return;
         }
 
-        const endpoint = isSignup ? "https://thesolarax.onrender.com/auth/signup" : "https://thesolarax.onrender.com/auth/login";
+        const endpoint = isSignup ? "/auth/signup" : "/auth/login";
         const requestData = isSignup ? { name, email, password } : { email, password };
 
         submitBtn.disabled = true;
@@ -76,13 +75,9 @@
             }
 
             alert(data.msg);
-            if (!isSignup) {
-                localStorage.setItem("token", data.token);
-                localStorage.setItem("role", data.role);
-                window.location.href = "homepage.html";
-            }
+            localStorage.setItem("token", data.token);
+            window.location.href = "homepage.html";
         } catch (error) {
-            console.error("Login/Signup Error:", error);
             alert(error.message);
         } finally {
             submitBtn.disabled = false;

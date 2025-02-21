@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payments | zeBRO</title>
-    <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -60,7 +60,8 @@
         document.getElementById("qr-code-container").style.display = "block";
         document.getElementById("payment-proof-form").style.display = "block";
     }
-let selectedAmount = 0; // ✅ Declare globally
+
+    let selectedAmount = 0; // ✅ Declare globally
 
     function submitPaymentProof() {
         const token = localStorage.getItem("token");
@@ -101,7 +102,7 @@ let selectedAmount = 0; // ✅ Declare globally
             paymentList.innerHTML = "";
             data.payments.forEach(payment => {
                 const div = document.createElement("div");
-                div.innerHTML = `<p>Plan: ${payment.amount} | Status: ${payment.status}</p>`;
+                div.innerHTML = `<p>Plan: ₹${payment.amount} | Status: ${payment.status}</p>`;
                 paymentList.appendChild(div);
             });
         })

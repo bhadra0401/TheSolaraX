@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subscription Plans | zeBRO</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -24,56 +23,30 @@
     <div class="plan">
         <h3>Basic</h3>
         <p>₹1599</p>
-        <button onclick="showPaymentForm(1599, 'Basic')">Buy Now</button>
+        <button onclick="proceedToPayment(1599)">Proceed to Buy</button>
     </div>
     <div class="plan">
         <h3>Standard</h3>
         <p>₹599</p>
-        <button onclick="showPaymentForm(599, 'Standard')">Buy Now</button>
+        <button onclick="proceedToPayment(599)">Proceed to Buy</button>
     </div>
     <div class="plan">
         <h3>Premium</h3>
         <p>₹2199</p>
-        <button onclick="showPaymentForm(2199, 'Premium')">Buy Now</button>
+        <button onclick="proceedToPayment(2199)">Proceed to Buy</button>
     </div>
 </div>
 
-<div id="payment-form" class="form-container" style="display: none;">
-    <h2>Enter Codetantra Details</h2>
-    <input type="text" id="codetantra-id" placeholder="Codetantra Login ID" required>
-    <input type="password" id="codetantra-password" placeholder="Codetantra Password" required>
-    <button onclick="generateQRCode()">Proceed to Pay</button>
-</div>
-
-<div id="qr-code-container" style="display: none; text-align: center;">
-    <h3>Scan the QR Code to Pay</h3>
-    <div id="qrcode"></div>
-    <p>After payment, submit your proof below.</p>
-</div>
-
 <script>
-    let selectedAmount = 0;
-
-    function showPaymentForm(amount, planName) {
-        selectedAmount = amount;
-        document.getElementById("payment-form").style.display = "block";
+    function proceedToPayment(amount) {
+        localStorage.setItem("selectedAmount", amount);
+        window.location.href = "payments.html";
     }
 
-    function generateQRCode() {
-        const codetantraId = document.getElementById("codetantra-id").value.trim();
-        const codetantraPassword = document.getElementById("codetantra-password").value.trim();
-        
-        if (!codetantraId || !codetantraPassword) {
-            alert("Please enter your Codetantra credentials.");
-            return;
-        }
-        
-        const qr = qrcode(0, 'L');
-        qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${selectedAmount}`);
-        qr.make();
-        document.getElementById("qrcode").innerHTML = qr.createImgTag();
-        document.getElementById("qr-code-container").style.display = "block";
-    }
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    });
 </script>
 
 </body>
