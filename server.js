@@ -87,6 +87,17 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     }
 });
 
+// ✅ Fetch Payment Status
+app.get("/payment-status", async (req, res) => {
+    try {
+        const payments = await Payment.find({});
+        res.json({ payments });
+    } catch (error) {
+        console.error("❌ Error fetching payments:", error);
+        res.status(500).json({ msg: "Server error" });
+    }
+});
+
 // ✅ Root Route (For Testing)
 app.get("/", (req, res) => {
     res.send("Server is running 🚀");
