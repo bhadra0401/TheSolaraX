@@ -96,13 +96,18 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
 // ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
     try {
-        const payments = await Payment.find({});
-        res.json({ payments });
+        const token = req.header("Authorization").replace("Bearer ", "");
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
+
+        const userPayments = await Payment.find({ codetantraId: decoded.email }); // ✅ Filter by logged-in user
+        res.json({ payments: userPayments });
+
     } catch (error) {
         console.error("❌ Error fetching payments:", error);
         res.status(500).json({ msg: "Server error" });
     }
 });
+
 
 // ✅ Root Route (For Testing)
 app.get("/", (req, res) => {
