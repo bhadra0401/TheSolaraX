@@ -7,6 +7,7 @@ const nodemailer = require("nodemailer");
 const path = require("path");
 const Payment = require("./paymentModel");
 const User = require("./userModel");
+const authRouter = require("./authRouter"); // ✅ Add Auth Routes
 
 const app = express();
 app.use(express.json());
@@ -16,10 +17,17 @@ app.use(cors());
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
+// ✅ Use Authentication Routes
+app.use("/auth", authRouter); // ✅ Fix Missing Auth Routes
+
 // ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection error:", err));
+
+mongoose.connection.on("error", (err) => {
+    console.error("❌ MongoDB Disconnected:", err);
+});
 
 // ✅ Multer Setup for File Uploads
 const storage = multer.diskStorage({
@@ -72,6 +80,11 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         console.error("❌ Error submitting payment:", error);
         res.status(500).json({ msg: "Server error" });
     }
+});
+
+// ✅ Root Route (For Testing)
+app.get("/", (req, res) => {
+    res.send("Server is running 🚀");
 });
 
 const PORT = process.env.PORT || 5000;
