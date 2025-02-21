@@ -50,9 +50,9 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         console.log("📌 Payment Submission Attempt:", req.body);
         console.log("📌 Uploaded File Details:", req.file);
 
-        const { codetantraId, codetantraPassword, paymentId } = req.body;
-        if (!codetantraId || !codetantraPassword || !paymentId || !req.file) {
-            console.error("❌ Missing Fields:", { codetantraId, codetantraPassword, paymentId, file: req.file });
+        const { codetantraId, codetantraPassword, paymentId, amount } = req.body;
+        if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file) {
+            console.error("❌ Missing Fields:", { codetantraId, codetantraPassword, paymentId, amount, file: req.file });
             return res.status(400).json({ msg: "All fields are required." });
         }
 
@@ -61,7 +61,9 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             codetantraId,
             codetantraPassword,
             paymentId,
-            screenshotUrl: `/uploads/${req.file.filename}`
+            amount: parseInt(amount, 10),  // ✅ Ensure amount is stored as a number
+            screenshotUrl: `/uploads/${req.file.filename}`,
+            status: "Pending"  // ✅ Set default status as Pending
         });
         await newPayment.save();
 
@@ -83,6 +85,7 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             html: `<p><strong>Codetantra ID:</strong> ${codetantraId}</p>
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
+                   <p><strong>Amount:</strong> ₹${amount}</p>
                    <p><strong>Screenshot:</strong> <a href="${req.protocol}://${req.get("host")}/uploads/${req.file.filename}" target="_blank">View Screenshot</a></p>`
         };
 
