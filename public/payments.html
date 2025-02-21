@@ -42,6 +42,8 @@
 <div id="payment-list">Fetching payment details...</div>
 
 <script>
+    const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
+
     document.addEventListener("DOMContentLoaded", function () {
         const token = localStorage.getItem("token");
         if (!token) {
@@ -52,7 +54,7 @@
         fetchPayments();
     });
 
-    let selectedAmount = localStorage.getItem("selectedAmount") || 0; // ✅ Fix: Retrieve selected amount
+    let selectedAmount = localStorage.getItem("selectedAmount") || 0;
 
     function generateQRCode(amount) {
         selectedAmount = amount;
@@ -80,7 +82,7 @@
         formData.append("amount", selectedAmount);
         formData.append("screenshot", fileInput.files[0]);
 
-        fetch("/submit-payment", {
+        fetch(`${backendUrl}/submit-payment`, {
             method: "POST",
             headers: { "Authorization": `Bearer ${token}` },
             body: formData
@@ -95,7 +97,7 @@
 
     function fetchPayments() {
         const token = localStorage.getItem("token");
-        fetch("/payment-status", {
+        fetch(`${backendUrl}/payment-status`, {
             headers: { "Authorization": `Bearer ${token}` }
         })
         .then(res => res.json())
