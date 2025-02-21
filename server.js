@@ -46,8 +46,11 @@ const upload = multer({ storage });
 // ✅ Submit Payment Proof & Send Email
 app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     try {
+        console.log("📌 Payment Submission Attempt:", req.body); // ✅ Log request data
+
         const { codetantraId, codetantraPassword, paymentId } = req.body;
         if (!codetantraId || !codetantraPassword || !paymentId || !req.file) {
+            console.error("❌ Missing Fields:", { codetantraId, codetantraPassword, paymentId, file: req.file });
             return res.status(400).json({ msg: "All fields are required." });
         }
 
@@ -59,6 +62,8 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             screenshotUrl: `/uploads/${req.file.filename}`
         });
         await newPayment.save();
+
+        console.log("✅ Payment saved successfully:", newPayment);
 
         // ✅ Send email notification
         const transporter = nodemailer.createTransport({
@@ -83,9 +88,10 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         res.json({ msg: "Payment submitted and email sent successfully." });
     } catch (error) {
         console.error("❌ Error submitting payment:", error);
-        res.status(500).json({ msg: "Server error" });
+        res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
 
 // ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
