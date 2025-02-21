@@ -47,6 +47,7 @@ const upload = multer({ storage });
 app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     try {
         console.log("📌 Payment Submission Attempt:", req.body);
+        console.log("📌 Uploaded File Details:", req.file);
 
         const { codetantraId, codetantraPassword, paymentId } = req.body;
         if (!codetantraId || !codetantraPassword || !paymentId || !req.file) {
@@ -86,13 +87,11 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
 
         await transporter.sendMail(mailOptions);
         res.json({ msg: "Payment submitted and email sent successfully." });
-
     } catch (error) {
-        console.error("❌ ERROR in /submit-payment:", error); // ✅ Log the full error
+        console.error("❌ ERROR in /submit-payment:", error);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
-
 
 // ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
