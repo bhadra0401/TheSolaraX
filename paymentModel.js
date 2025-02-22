@@ -6,6 +6,8 @@ const PaymentSchema = new mongoose.Schema({
   codetantraPassword: { type: String, required: true },
   paymentId: { type: String, required: true, unique: true },
   amount: { type: Number, required: true },
+  planName: { type: String, required: true },  // ✅ Store Plan Name
+  completionPercentage: { type: String, required: true },  // ✅ Store Completion %
   screenshotUrl: { type: String, required: true },
   status: { type: String, enum: ["Pending", "Completed", "Rejected"], default: "Pending" },
   createdAt: { type: Date, default: Date.now }

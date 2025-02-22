@@ -52,10 +52,9 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
 
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
+        const { codetantraId, codetantraPassword, paymentId, amount, planName, completionPercentage } = req.body;
 
-        const { codetantraId, codetantraPassword, paymentId, amount } = req.body;
-        if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file) {
-            console.error("❌ Missing Fields:", { codetantraId, codetantraPassword, paymentId, amount, file: req.file });
+        if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file || !planName || !completionPercentage) {
             return res.status(400).json({ msg: "All fields are required." });
         }
 
@@ -67,13 +66,15 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
 
         // ✅ Save payment with user's email
         const newPayment = new Payment({
-            email: user.email,  // ✅ Store the user's email
+            email: user.email,
             codetantraId,
             codetantraPassword,
             paymentId,
-            amount: parseInt(amount, 10),  // ✅ Ensure amount is stored as a number
+            amount: parseInt(amount, 10),
+            planName,
+            completionPercentage,
             screenshotUrl: `/uploads/${req.file.filename}`,
-            status: "Pending"  // ✅ Set default status as Pending
+            status: "Pending"
         });
         await newPayment.save();
 
@@ -93,6 +94,8 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             to: process.env.OWNER_EMAIL,
             subject: "New Payment Submission",
             html: `<p><strong>User Email:</strong> ${user.email}</p>
+                   <p><strong>Plan Name:</strong> ${planName}</p>
+                   <p><strong>Completion Percentage:</strong> ${completionPercentage}</p>
                    <p><strong>Codetantra ID:</strong> ${codetantraId}</p>
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
