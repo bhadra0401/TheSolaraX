@@ -17,13 +17,6 @@ body {
     padding: 20px;
 }
 
-/* Responsive Container */
-.container {
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-}
-
 /* Header */
 header {
     background: linear-gradient(135deg, #6a5acd, #483d8b);
@@ -34,52 +27,35 @@ header {
     align-items: center;
     box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     border-radius: 10px;
-    flex-wrap: wrap;
 }
 
 .logo {
-    font-size: 24px;
+    font-size: 28px;
     font-weight: 600;
-}
-
-nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 15px;
 }
 
 nav a {
     color: white;
     text-decoration: none;
+    margin: 0 15px;
+    font-weight: 500;
+    transition: 0.3s;
     padding: 8px 12px;
     border-radius: 6px;
-    transition: 0.3s;
 }
 
 nav a:hover {
     background: rgba(255, 255, 255, 0.2);
 }
 
-/* Mobile Menu */
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    nav {
-        flex-direction: column;
-        width: 100%;
-        margin-top: 10px;
-    }
-    
-    nav a {
-        display: block;
-        padding: 10px;
-    }
+/* Forms */
+.container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
 }
 
-/* Forms */
 .form-container {
     background: white;
     padding: 30px;
@@ -88,13 +64,13 @@ nav a:hover {
     width: 100%;
     max-width: 400px;
     text-align: center;
-    margin: auto;
 }
 
-input, button {
+input {
     width: 100%;
     padding: 12px;
     margin: 10px 0;
+    border: 1px solid #ccc;
     border-radius: 8px;
     font-size: 16px;
     transition: 0.3s;
@@ -110,9 +86,13 @@ button {
     background: #6a5acd;
     color: white;
     border: none;
+    padding: 12px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 18px;
     font-weight: 500;
+    transition: 0.3s;
+    width: 100%;
 }
 
 button:hover {
@@ -120,9 +100,59 @@ button:hover {
     transform: scale(1.05);
 }
 
-/* Mobile Friendly Styles */
-@media (max-width: 480px) {
-    .form-container {
-        width: 90%;
-    }
+/* Plans Page */
+.plans {
+    display: flex;
+    justify-content: center;
+    gap: 25px;
+    flex-wrap: wrap;
+    margin: 40px auto;
+    max-width: 900px;
 }
+
+.plan {
+    background: white;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    transition: 0.3s;
+    width: 280px;
+}
+
+.plan:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.plan button {
+    margin-top: 15px;
+}
+
+/* Payment Status */
+.payment-card {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+    margin-bottom: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.3s;
+}
+
+.payment-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+}
+
+.payment-status {
+    font-weight: bold;
+    padding: 8px 12px;
+    border-radius: 6px;
+}
+
+.paid { background: #4CAF50; color: white; }
+.pending { background: #FFC107; color: white; }
+.canceled { background: #F44336; color: white; }
