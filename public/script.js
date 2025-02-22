@@ -36,6 +36,9 @@ function fetchUserProfile() {
 
 function logout() {
   localStorage.removeItem("token");
+  localStorage.removeItem("selectedAmount"); // ✅ Clear stored amount
+  localStorage.removeItem("selectedPlanName"); // ✅ Clear stored plan name
+  localStorage.removeItem("selectedCompletionPercentage"); // ✅ Clear stored completion percentage
   window.location.href = "index.html";
 }
 

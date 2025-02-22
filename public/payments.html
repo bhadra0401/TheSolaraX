@@ -125,7 +125,9 @@
     function generateQRCode(amount, planName, planPercentage) {
         selectedAmount = amount;
         localStorage.setItem("selectedAmount", amount);
-        
+        localStorage.setItem("selectedPlanName", planName); // ✅ Store Plan Name
+        localStorage.setItem("selectedCompletionPercentage", planPercentage); // ✅ Store Completion %
+
         document.getElementById("selected-plan-name").textContent = planName;
         document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
         document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
@@ -148,8 +150,10 @@
     const fileInput = document.getElementById("screenshot");
 
     let selectedAmount = localStorage.getItem("selectedAmount"); // ✅ Ensure amount is retrieved
+    let selectedPlanName = localStorage.getItem("selectedPlanName"); // ✅ Retrieve Plan Name
+    let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage"); // ✅ Retrieve Completion %
 
-    if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length || !selectedAmount) {
+    if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length || !selectedAmount || !selectedPlanName || !selectedCompletionPercentage) {
         alert("Please fill all fields before submitting.");
         return;
     }
@@ -159,6 +163,8 @@
     formData.append("codetantraPassword", codetantraPassword);
     formData.append("paymentId", paymentId);
     formData.append("amount", selectedAmount);  // ✅ Include amount in request
+    formData.append("planName", selectedPlanName); // ✅ Include Plan Name
+    formData.append("completionPercentage", selectedCompletionPercentage); // ✅ Include Completion %
     formData.append("screenshot", fileInput.files[0]);
 
     fetch(`${backendUrl}/submit-payment`, {
