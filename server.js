@@ -8,7 +8,7 @@ const path = require("path");
 const Payment = require("./paymentModel");
 const User = require("./userModel");
 const authRouter = require("./authRouter");
-const jwt = require("jsonwebtoken");
+const jwt = require("jsonwebtoken"); // ✅ Add this line
 
 const app = express();
 app.use(express.json());
@@ -19,14 +19,14 @@ app.use(cors({
     credentials: true
 }));
 
-// Serve static files (Frontend)
+// ✅ Serve static files (Frontend)
 app.use(express.static("public"));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-// Use Authentication Routes
+// ✅ Use Authentication Routes
 app.use("/auth", authRouter);
 
-// MongoDB Connection
+// ✅ MongoDB Connection
 mongoose.connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => console.log("✅ MongoDB connected"))
   .catch(err => console.log("❌ MongoDB connection error:", err));
@@ -35,7 +35,7 @@ mongoose.connection.on("error", (err) => {
     console.error("❌ MongoDB Disconnected:", err);
 });
 
-// Multer Setup for File Uploads
+// ✅ Multer Setup for File Uploads
 const storage = multer.diskStorage({
     destination: "uploads/",
     filename: (req, file, cb) => {
@@ -44,7 +44,7 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
-// Submit Payment Proof & Send Email
+// ✅ Submit Payment Proof & Send Email
 app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     try {
         console.log("📌 Payment Submission Attempt:", req.body);
@@ -59,24 +59,27 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             return res.status(400).json({ msg: "All fields are required." });
         }
 
+        // ✅ Find the user's email from the database
         const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
 
+        // ✅ Save payment with user's email
         const newPayment = new Payment({
-            email: user.email,
+            email: user.email,  // ✅ Store the user's email
             codetantraId,
             codetantraPassword,
             paymentId,
-            amount: parseInt(amount, 10),
+            amount: parseInt(amount, 10),  // ✅ Ensure amount is stored as a number
             screenshotUrl: `/uploads/${req.file.filename}`,
-            status: "Pending"
+            status: "Pending"  // ✅ Set default status as Pending
         });
         await newPayment.save();
 
         console.log("✅ Payment saved successfully:", newPayment);
 
+        // ✅ Send email notification
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -105,18 +108,23 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     }
 });
 
-// Fetch Payment Status
+// ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
     try {
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
 
-        const user = await User.findById(decoded.id);
+        console.log("📌 Decoded Token:", decoded); // ✅ Debugging log
+
+        const user = await User.findById(decoded.id); // ✅ Get the user from DB
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
 
-        const userPayments = await Payment.find({ email: user.email });
+        console.log("📌 Fetching payments for:", user.email); // ✅ Log correct email
+        const userPayments = await Payment.find({ email: user.email }); // ✅ Use email instead of codetantraId
+
+        console.log("📌 User Payments Found:", userPayments); // ✅ Log the fetched payments
         res.json({ payments: userPayments });
 
     } catch (error) {
@@ -125,7 +133,8 @@ app.get("/payment-status", async (req, res) => {
     }
 });
 
-// Root Route
+
+// ✅ Root Route (For Testing)
 app.get("/", (req, res) => {
     res.send("Server is running 🚀");
 });
