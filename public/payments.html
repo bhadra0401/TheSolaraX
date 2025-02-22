@@ -6,7 +6,7 @@
     <title>Payments | zeBRO</title>
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
     <link rel="stylesheet" href="style.css">
-    <style>
+	 <style>
         .payment-options {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -62,6 +62,26 @@
         <button onclick="generateQRCode(1299, 'Java Full Stack SEC - 2 -', '50%')">Pay ₹1299</button>
     </div>
 </div>
+<div class="payment-options">
+    <div class="plan">
+        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
+        <h2>100%</h2>
+        <p>₹599</p>
+        <button onclick="generateQRCode(599, 'Java Full Stack Laboratory SEC- 2 -', '100%')">Pay ₹599</button>
+    </div>
+    <div class="plan">
+        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
+        <h2>75%</h2>
+        <p>₹1399</p>
+        <button onclick="generateQRCode(499, 'Java Full Stack Laboratory SEC- 2 -', '75%')">Pay ₹499</button>
+    </div>
+    <div class="plan">
+        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
+        <h2>50%</h2>
+        <p>₹1299</p>
+        <button onclick="generateQRCode(369, 'Java Full Stack Laboratory SEC- 2 -', '50%')">Pay ₹369</button>
+    </div>
+</div>
 
 <div class="selected-plan" id="selected-plan">
     <h2 id="selected-plan-name"></h2>
@@ -100,6 +120,8 @@
         fetchPayments();
     });
 
+    let selectedAmount = localStorage.getItem("selectedAmount") || 0;
+
     function generateQRCode(amount, planName, planPercentage) {
         selectedAmount = amount;
         localStorage.setItem("selectedAmount", amount);
@@ -117,6 +139,78 @@
         document.getElementById("payment-proof-form").style.display = "block";
         document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
     }
+
+    function submitPaymentProof() {
+    const token = localStorage.getItem("token");
+    const codetantraId = document.getElementById("codetantra-id").value.trim();
+    const codetantraPassword = document.getElementById("codetantra-password").value.trim();
+    const paymentId = document.getElementById("payment-id").value.trim();
+    const fileInput = document.getElementById("screenshot");
+
+    let selectedAmount = localStorage.getItem("selectedAmount"); // ✅ Ensure amount is retrieved
+
+    if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length || !selectedAmount) {
+        alert("Please fill all fields before submitting.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("codetantraId", codetantraId);
+    formData.append("codetantraPassword", codetantraPassword);
+    formData.append("paymentId", paymentId);
+    formData.append("amount", selectedAmount);  // ✅ Include amount in request
+    formData.append("screenshot", fileInput.files[0]);
+
+    fetch(${backendUrl}/submit-payment, {
+        method: "POST",
+        headers: { "Authorization": Bearer ${token} },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        alert(data.msg);
+        fetchPayments();
+    })
+    .catch(() => alert("Error submitting proof."));
+}
+
+
+    function fetchPayments() {
+    const token = localStorage.getItem("token");
+
+    fetch(${backendUrl}/payment-status, {
+        headers: { "Authorization": Bearer ${token} }
+    })
+    .then(res => res.json())
+    .then(data => {
+        const paymentList = document.getElementById("payment-list");
+        paymentList.innerHTML = ""; // ✅ Clear previous entries
+
+        console.log("📌 Received Payments Data:", data.payments); // ✅ Debugging log
+
+        if (data.payments.length === 0) {
+            paymentList.innerHTML = "<p>No payments found.</p>";
+            return;
+        }
+
+        data.payments.forEach(payment => {
+            const div = document.createElement("div");
+            div.innerHTML = 
+                <p><strong>Plan:</strong> ₹${payment.amount || "N/A"} | <strong>Status:</strong> ${payment.status || "Pending"}</p>
+                <p><strong>Payment ID:</strong> ${payment.paymentId || "N/A"}</p>
+                <p><strong>Screenshot:</strong> <a href="${backendUrl}${payment.screenshotUrl}" target="_blank">View Screenshot</a></p>
+                <hr>
+            ;
+            paymentList.appendChild(div);
+        });
+    })
+    .catch(error => {
+        console.error("❌ Error fetching payments:", error);
+        alert("Error fetching payments.");
+    });
+}
+
+
 </script>
 
 </body>
