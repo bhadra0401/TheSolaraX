@@ -156,9 +156,10 @@
     const paymentId = document.getElementById("payment-id").value.trim();
     const fileInput = document.getElementById("screenshot");
 
-    let selectedAmount = localStorage.getItem("selectedAmount"); // ✅ Ensure amount is retrieved
-    let selectedPlanName = localStorage.getItem("selectedPlanName"); // ✅ Retrieve Plan Name
-    let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage"); // ✅ Retrieve Completion %
+    let selectedAmount = localStorage.getItem("selectedAmount"); 
+    let selectedPlanName = localStorage.getItem("selectedPlanName");  
+    let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage");  
+    let referralCode = localStorage.getItem("appliedReferralCode") || null; // ✅ Retrieve stored referral code
 
     if (!codetantraId || !codetantraPassword || !paymentId || !fileInput.files.length || !selectedAmount || !selectedPlanName || !selectedCompletionPercentage) {
         alert("Please fill all fields before submitting.");
@@ -169,9 +170,10 @@
     formData.append("codetantraId", codetantraId);
     formData.append("codetantraPassword", codetantraPassword);
     formData.append("paymentId", paymentId);
-    formData.append("amount", selectedAmount);  // ✅ Include amount in request
-    formData.append("planName", selectedPlanName); // ✅ Include Plan Name
-    formData.append("completionPercentage", selectedCompletionPercentage); // ✅ Include Completion %
+    formData.append("amount", selectedAmount);  
+    formData.append("planName", selectedPlanName);  
+    formData.append("completionPercentage", selectedCompletionPercentage);  
+    formData.append("referralCode", referralCode); // ✅ Send referral code
     formData.append("screenshot", fileInput.files[0]);
 
     fetch(`${backendUrl}/submit-payment`, {
@@ -186,6 +188,7 @@
     })
     .catch(() => alert("Error submitting proof."));
 }
+
 
 
     function fetchPayments() {
