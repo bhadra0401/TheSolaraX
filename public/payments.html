@@ -130,24 +130,24 @@
     let selectedAmount = localStorage.getItem("selectedAmount") || 0;
 
     function generateQRCode(amount, planName, planPercentage) {
-    selectedAmount = amount;
-    localStorage.setItem("selectedAmount", amount);
-    localStorage.setItem("selectedPlanName", planName);
-    localStorage.setItem("selectedCompletionPercentage", planPercentage);
+        selectedAmount = amount;
+        localStorage.setItem("selectedAmount", amount);
+        localStorage.setItem("selectedPlanName", planName); // ✅ Store Plan Name
+        localStorage.setItem("selectedCompletionPercentage", planPercentage); // ✅ Store Completion %
 
-    document.getElementById("selected-plan-name").textContent = planName;
-    document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
-    document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
-
-    const qr = qrcode(0, 'L');
-    qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
-    qr.make();
-    document.getElementById("qrcode").innerHTML = qr.createImgTag();
-    document.getElementById("qr-code-container").style.display = "block";
-    document.getElementById("payment-proof-form").style.display = "block";
-    document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
-}
-
+        document.getElementById("selected-plan-name").textContent = planName;
+        document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
+        document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
+        document.getElementById("selected-plan").style.display = "block";
+        
+        const qr = qrcode(0, 'L');
+        qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
+        qr.make();
+        document.getElementById("qrcode").innerHTML = qr.createImgTag();
+        document.getElementById("qr-code-container").style.display = "block";
+        document.getElementById("payment-proof-form").style.display = "block";
+        document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
+    }
 
     function submitPaymentProof() {
     const token = localStorage.getItem("token");
@@ -228,34 +228,31 @@ let referralCode = "";
 
 function applyReferralCode() {
     const code = document.getElementById("referral-code").value.trim();
-    console.log("Applying Referral Code:", code); // ✅ Debugging Log
-
     fetch(`${backendUrl}/validate-referral`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+            "Content-Type": "application/json"
+        },
         body: JSON.stringify({ code })
     })
     .then(res => res.json())
     .then(data => {
-        console.log("API Response:", data); // ✅ Debugging Log
-
         if (data.valid) {
             discountApplied = true;
             referralCode = code;
+            let discountedAmount = selectedAmount * 0.8;
 
-            let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
-            let discountedAmount = (selectedAmount * 0.8).toFixed(2);
+            // ✅ Retrieve Plan Name & Completion from LocalStorage
+            let selectedPlanName = localStorage.getItem("selectedPlanName") || "N/A";
+            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "N/A";
 
-            let selectedPlanName = localStorage.getItem("selectedPlanName") || "Plan Name Not Available";
-            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "0%";
-
-            localStorage.setItem("discountedAmount", discountedAmount);
-
+            // ✅ Update UI with Correct Details
             document.getElementById("selected-plan-name").textContent = selectedPlanName;
             document.getElementById("selected-plan-details").textContent = `Completion: ${selectedCompletionPercentage}`;
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
 
-            generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
+            // ✅ Update QR Code with Discounted Price
+            generateQRCode(discountedAmount);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
@@ -265,8 +262,7 @@ function applyReferralCode() {
         }
         document.getElementById("referral-status").style.display = "block";
     })
-    .catch((error) => {
-        console.error("❌ Error in referral validation:", error);
+    .catch(() => {
         document.getElementById("referral-status").textContent = "Error validating referral code.";
         document.getElementById("referral-status").style.color = "red";
         document.getElementById("referral-status").style.display = "block";
