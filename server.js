@@ -44,6 +44,18 @@ const storage = multer.diskStorage({
 });
 const upload = multer({ storage });
 
+// ✅ Referral Code Validation Endpoint
+app.post("/validate-referral", async (req, res) => {
+    const { code } = req.body;
+    const validReferralCodes = ["ZEBRO20", "DISCOUNT20"];
+    if (validReferralCodes.includes(code)) {
+        res.json({ valid: true });
+    } else {
+        res.json({ valid: false });
+    }
+});
+
+
 // ✅ Submit Payment Proof & Send Email
 app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
     try {
@@ -100,6 +112,7 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
                    <p><strong>Amount:</strong> ₹${amount}</p>
+                   <p><strong>Referral Code:</strong> ${referralCode || 'None'}</p>
                    <p><strong>Screenshot:</strong> <a href="${req.protocol}://${req.get("host")}/uploads/${req.file.filename}" target="_blank">View Screenshot</a></p>`
         };
 
