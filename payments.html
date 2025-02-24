@@ -252,7 +252,7 @@ function applyReferralCode() {
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
 
             // ✅ Update QR Code with Discounted Price
-            generateQRCode(discountedAmount);
+            generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
