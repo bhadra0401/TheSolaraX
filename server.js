@@ -81,12 +81,18 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         }
 
         // ✅ Validate Referral Code (If Provided)
-        let isReferralValid = false;
+        let finalReferralCode = null;
         if (referralCode) {
-            isReferralValid = validReferralCodes.includes(referralCode);
-            if (!isReferralValid) {
+            if (!validReferralCodes || !Array.isArray(validReferralCodes)) {
+                console.error("❌ ERROR: validReferralCodes is not defined correctly!");
+                return res.status(500).json({ msg: "Server error: Referral codes are not set up properly." });
+            }
+
+            if (!validReferralCodes.includes(referralCode)) {
                 return res.status(400).json({ msg: "Invalid referral code." });
             }
+
+            finalReferralCode = referralCode; // ✅ Save valid referral code
         }
 
         // ✅ Save Payment Details to Database
@@ -98,7 +104,7 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             amount: parseInt(amount, 10),
             planName,
             completionPercentage,
-            referralCode: isReferralValid ? referralCode : null, // ✅ Store only valid referral codes
+            referralCode: finalReferralCode, // ✅ Save only valid referral codes
             screenshotUrl: `/uploads/${req.file.filename}`,
             status: "Pending"
         });
@@ -126,7 +132,7 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
                    <p><strong>Amount:</strong> ₹${amount}</p>
-                   <p><strong>Referral Code:</strong> ${isReferralValid ? referralCode : 'None'}</p>
+                   <p><strong>Referral Code:</strong> ${finalReferralCode || 'None'}</p>
                    <p><strong>Screenshot:</strong> <a href="${req.protocol}://${req.get("host")}/uploads/${req.file.filename}" target="_blank">View Screenshot</a></p>`
         };
 
@@ -138,7 +144,6 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
-
 
 // ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
