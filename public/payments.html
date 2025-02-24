@@ -130,24 +130,24 @@
     let selectedAmount = localStorage.getItem("selectedAmount") || 0;
 
     function generateQRCode(amount, planName, planPercentage) {
-        selectedAmount = amount;
-        localStorage.setItem("selectedAmount", amount);
-        localStorage.setItem("selectedPlanName", planName); // ✅ Store Plan Name
-        localStorage.setItem("selectedCompletionPercentage", planPercentage); // ✅ Store Completion %
+    selectedAmount = amount;
+    localStorage.setItem("selectedAmount", amount);
+    localStorage.setItem("selectedPlanName", planName);
+    localStorage.setItem("selectedCompletionPercentage", planPercentage);
 
-        document.getElementById("selected-plan-name").textContent = planName;
-        document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
-        document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
-        document.getElementById("selected-plan").style.display = "block";
-        
-        const qr = qrcode(0, 'L');
-        qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
-        qr.make();
-        document.getElementById("qrcode").innerHTML = qr.createImgTag();
-        document.getElementById("qr-code-container").style.display = "block";
-        document.getElementById("payment-proof-form").style.display = "block";
-        document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
-    }
+    document.getElementById("selected-plan-name").textContent = planName;
+    document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
+    document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
+
+    const qr = qrcode(0, 'L');
+    qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
+    qr.make();
+    document.getElementById("qrcode").innerHTML = qr.createImgTag();
+    document.getElementById("qr-code-container").style.display = "block";
+    document.getElementById("payment-proof-form").style.display = "block";
+    document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
+}
+
 
     function submitPaymentProof() {
     const token = localStorage.getItem("token");
@@ -240,19 +240,24 @@ function applyReferralCode() {
         if (data.valid) {
             discountApplied = true;
             referralCode = code;
-            let discountedAmount = selectedAmount * 0.8;
 
-            // ✅ Retrieve Plan Name & Completion from LocalStorage
-            let selectedPlanName = localStorage.getItem("selectedPlanName") || "N/A";
-            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "N/A";
+            let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
+            let discountedAmount = (selectedAmount * 0.8).toFixed(2); // ✅ Convert to number & fix floating-point issue
+
+            // ✅ Retrieve Plan Name & Completion Percentage
+            let selectedPlanName = localStorage.getItem("selectedPlanName") || "Plan Name Not Available";
+            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "0%";
+
+            // ✅ Store discounted amount in localStorage
+            localStorage.setItem("discountedAmount", discountedAmount);
 
             // ✅ Update UI with Correct Details
             document.getElementById("selected-plan-name").textContent = selectedPlanName;
             document.getElementById("selected-plan-details").textContent = `Completion: ${selectedCompletionPercentage}`;
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
 
-            // ✅ Update QR Code with Discounted Price
-            generateQRCode(discountedAmount);
+            // ✅ Pass correct values to generate QR Code
+            generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
