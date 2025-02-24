@@ -230,9 +230,7 @@ function applyReferralCode() {
     const code = document.getElementById("referral-code").value.trim();
     fetch(`${backendUrl}/validate-referral`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code })
     })
     .then(res => res.json())
@@ -242,7 +240,7 @@ function applyReferralCode() {
             referralCode = code;
             let discountedAmount = selectedAmount * 0.8;
 
-            // ✅ Retrieve Plan Name & Completion from LocalStorage
+            // ✅ Retrieve stored values from LocalStorage
             let selectedPlanName = localStorage.getItem("selectedPlanName") || "N/A";
             let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "N/A";
 
@@ -252,7 +250,7 @@ function applyReferralCode() {
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
 
             // ✅ Update QR Code with Discounted Price
-            generateQRCode(discountedAmount);
+            generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
@@ -268,6 +266,7 @@ function applyReferralCode() {
         document.getElementById("referral-status").style.display = "block";
     });
 }
+
 
 
 document.getElementById("logoutBtn").addEventListener("click", function () {
