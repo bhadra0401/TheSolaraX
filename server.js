@@ -62,21 +62,34 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         console.log("📌 Payment Submission Attempt:", req.body);
         console.log("📌 Uploaded File Details:", req.file);
 
+        // ✅ Extract Token & Verify User
         const token = req.header("Authorization").replace("Bearer ", "");
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
-        const { codetantraId, codetantraPassword, paymentId, amount, planName, completionPercentage } = req.body;
 
+        // ✅ Extract Required Data
+        const { codetantraId, codetantraPassword, paymentId, amount, planName, completionPercentage, referralCode } = req.body;
+
+        // ✅ Validate Required Fields
         if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file || !planName || !completionPercentage) {
             return res.status(400).json({ msg: "All fields are required." });
         }
 
-        // ✅ Find the user's email from the database
+        // ✅ Find the User
         const user = await User.findById(decoded.id);
         if (!user) {
             return res.status(404).json({ msg: "User not found" });
         }
 
-        // ✅ Save payment with user's email
+        // ✅ Validate Referral Code (If Provided)
+        let isReferralValid = false;
+        if (referralCode) {
+            isReferralValid = validReferralCodes.includes(referralCode);
+            if (!isReferralValid) {
+                return res.status(400).json({ msg: "Invalid referral code." });
+            }
+        }
+
+        // ✅ Save Payment Details to Database
         const newPayment = new Payment({
             email: user.email,
             codetantraId,
@@ -85,14 +98,15 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             amount: parseInt(amount, 10),
             planName,
             completionPercentage,
+            referralCode: isReferralValid ? referralCode : null, // ✅ Store only valid referral codes
             screenshotUrl: `/uploads/${req.file.filename}`,
             status: "Pending"
         });
-        await newPayment.save();
 
+        await newPayment.save();
         console.log("✅ Payment saved successfully:", newPayment);
 
-        // ✅ Send email notification
+        // ✅ Send Email Notification
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
@@ -112,17 +126,19 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
                    <p><strong>Codetantra Password:</strong> ${codetantraPassword}</p>
                    <p><strong>Payment ID:</strong> ${paymentId}</p>
                    <p><strong>Amount:</strong> ₹${amount}</p>
-                   <p><strong>Referral Code:</strong> ${referralCode || 'None'}</p>
+                   <p><strong>Referral Code:</strong> ${isReferralValid ? referralCode : 'None'}</p>
                    <p><strong>Screenshot:</strong> <a href="${req.protocol}://${req.get("host")}/uploads/${req.file.filename}" target="_blank">View Screenshot</a></p>`
         };
 
         await transporter.sendMail(mailOptions);
         res.json({ msg: "Payment submitted and email sent successfully." });
+
     } catch (error) {
         console.error("❌ ERROR in /submit-payment:", error);
         res.status(500).json({ msg: "Server error", error: error.message });
     }
 });
+
 
 // ✅ Fetch Payment Status
 app.get("/payment-status", async (req, res) => {
