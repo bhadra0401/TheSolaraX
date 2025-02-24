@@ -78,18 +78,16 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
 
         // ✅ Save payment with user's email
         const newPayment = new Payment({
-    email: user.email,
-    codetantraId,
-    codetantraPassword,
-    paymentId,
-    amount: parseInt(amount, 10),
-    planName,
-    completionPercentage,
-    screenshotUrl: `/uploads/${req.file.filename}`,
-    referralCode: req.body.referralCode || null, // ✅ Store referral code
-    status: "Pending"
-});
-
+            email: user.email,
+            codetantraId,
+            codetantraPassword,
+            paymentId,
+            amount: parseInt(amount, 10),
+            planName,
+            completionPercentage,
+            screenshotUrl: `/uploads/${req.file.filename}`,
+            status: "Pending"
+        });
         await newPayment.save();
 
         console.log("✅ Payment saved successfully:", newPayment);
