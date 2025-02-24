@@ -228,35 +228,33 @@ let referralCode = "";
 
 function applyReferralCode() {
     const code = document.getElementById("referral-code").value.trim();
+    console.log("Applying Referral Code:", code); // ✅ Debugging Log
+
     fetch(`${backendUrl}/validate-referral`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ code })
     })
     .then(res => res.json())
     .then(data => {
+        console.log("API Response:", data); // ✅ Debugging Log
+
         if (data.valid) {
             discountApplied = true;
             referralCode = code;
 
             let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
-            let discountedAmount = (selectedAmount * 0.8).toFixed(2); // ✅ Convert to number & fix floating-point issue
+            let discountedAmount = (selectedAmount * 0.8).toFixed(2);
 
-            // ✅ Retrieve Plan Name & Completion Percentage
             let selectedPlanName = localStorage.getItem("selectedPlanName") || "Plan Name Not Available";
             let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "0%";
 
-            // ✅ Store discounted amount in localStorage
             localStorage.setItem("discountedAmount", discountedAmount);
 
-            // ✅ Update UI with Correct Details
             document.getElementById("selected-plan-name").textContent = selectedPlanName;
             document.getElementById("selected-plan-details").textContent = `Completion: ${selectedCompletionPercentage}`;
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
 
-            // ✅ Pass correct values to generate QR Code
             generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
@@ -267,12 +265,14 @@ function applyReferralCode() {
         }
         document.getElementById("referral-status").style.display = "block";
     })
-    .catch(() => {
+    .catch((error) => {
+        console.error("❌ Error in referral validation:", error);
         document.getElementById("referral-status").textContent = "Error validating referral code.";
         document.getElementById("referral-status").style.color = "red";
         document.getElementById("referral-status").style.display = "block";
     });
 }
+
 
 document.getElementById("logoutBtn").addEventListener("click", function () {
         localStorage.removeItem("token");
