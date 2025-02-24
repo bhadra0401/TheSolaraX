@@ -48,13 +48,25 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // ✅ Referral Code Validation Endpoint
-app.post("/validate-referral", async (req, res) => {
-    const { code } = req.body;
 
-    if (validReferralCodes.includes(code)) {
-        res.json({ valid: true });
-    } else {
-        res.json({ valid: false });
+app.post("/validate-referral", async (req, res) => {
+    try {
+        const { code } = req.body;
+        console.log("📌 Received Referral Code:", code);
+
+        if (!code) {
+            return res.status(400).json({ msg: "No referral code provided." });
+        }
+
+        // ✅ Convert input code to uppercase & compare
+        if (validReferralCodes.includes(code.trim().toUpperCase())) {
+            res.json({ valid: true });
+        } else {
+            res.json({ valid: false });
+        }
+    } catch (error) {
+        console.error("❌ Error in /validate-referral:", error);
+        res.status(500).json({ msg: "Server error validating referral code." });
     }
 });
 
