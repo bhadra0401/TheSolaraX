@@ -9,6 +9,7 @@ const Payment = require("./paymentModel");
 const User = require("./userModel");
 const authRouter = require("./authRouter");
 const jwt = require("jsonwebtoken"); // ✅ Add this line
+const validReferralCodes = process.env.VALID_REFERRAL_CODES.split(",");
 
 const app = express();
 app.use(express.json());
@@ -47,14 +48,13 @@ const upload = multer({ storage });
 // ✅ Referral Code Validation Endpoint
 app.post("/validate-referral", async (req, res) => {
     const { code } = req.body;
-    const validReferralCodes = ["ZEBRO20", "DISCOUNT20"];
+
     if (validReferralCodes.includes(code)) {
         res.json({ valid: true });
     } else {
         res.json({ valid: false });
     }
 });
-
 
 // ✅ Submit Payment Proof & Send Email
 app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
