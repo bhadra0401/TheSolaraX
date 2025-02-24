@@ -9,7 +9,9 @@ const Payment = require("./paymentModel");
 const User = require("./userModel");
 const authRouter = require("./authRouter");
 const jwt = require("jsonwebtoken"); // ✅ Add this line
-const validReferralCodes = process.env.VALID_REFERRAL_CODES.split(",");
+// ✅ Ensure `validReferralCodes` is always an array
+const validReferralCodes = process.env.VALID_REFERRAL_CODES ? process.env.VALID_REFERRAL_CODES.split(",") : [];
+
 
 const app = express();
 app.use(express.json());
