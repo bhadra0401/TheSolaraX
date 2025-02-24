@@ -222,6 +222,42 @@
         alert("Error fetching payments.");
     });
 }
+
+let discountApplied = false;
+let referralCode = "";
+
+function applyReferralCode() {
+    const code = document.getElementById("referral-code").value.trim();
+    fetch(`${backendUrl}/validate-referral`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ code })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.valid) {
+            discountApplied = true;
+            referralCode = code;
+            let discountedAmount = selectedAmount * 0.8;
+            document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
+            generateQRCode(discountedAmount);
+            document.getElementById("referral-status").textContent = "Referral code applied!";
+            document.getElementById("referral-status").style.color = "green";
+        } else {
+            document.getElementById("referral-status").textContent = "Invalid referral code.";
+            document.getElementById("referral-status").style.color = "red";
+        }
+        document.getElementById("referral-status").style.display = "block";
+    })
+    .catch(() => {
+        document.getElementById("referral-status").textContent = "Error validating referral code.";
+        document.getElementById("referral-status").style.color = "red";
+        document.getElementById("referral-status").style.display = "block";
+    });
+}
+
 document.getElementById("logoutBtn").addEventListener("click", function () {
         localStorage.removeItem("token");
         window.location.href = "index.html";
