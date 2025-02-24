@@ -231,6 +231,12 @@ let referralCode = "";
 
 function applyReferralCode() {
     const code = document.getElementById("referral-code").value.trim();
+
+    if (discountApplied) {
+        alert("Referral code already applied!");
+        return; // Prevent multiple applications
+    }
+
     fetch(`${backendUrl}/validate-referral`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -241,11 +247,11 @@ function applyReferralCode() {
         if (data.valid) {
             discountApplied = true;
             referralCode = code;
-            let discountedAmount = selectedAmount * 0.8;
+            localStorage.setItem("appliedReferralCode", code); // ✅ Store in LocalStorage
+            let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
+            let discountedAmount = (selectedAmount * 0.8).toFixed(2); // ✅ Apply only once
 
-            // ✅ Retrieve stored values from LocalStorage
-            let selectedPlanName = localStorage.getItem("selectedPlanName") || "N/A";
-            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "N/A";
+            localStorage.setItem("selectedAmount", discountedAmount); // ✅ Save updated amount
 
             // ✅ Update UI with Correct Details
             document.getElementById("selected-plan-name").textContent = selectedPlanName;
