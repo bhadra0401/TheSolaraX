@@ -241,8 +241,19 @@ function applyReferralCode() {
             discountApplied = true;
             referralCode = code;
             let discountedAmount = selectedAmount * 0.8;
+
+            // ✅ Retrieve Plan Name & Completion from LocalStorage
+            let selectedPlanName = localStorage.getItem("selectedPlanName") || "N/A";
+            let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "N/A";
+
+            // ✅ Update UI with Correct Details
+            document.getElementById("selected-plan-name").textContent = selectedPlanName;
+            document.getElementById("selected-plan-details").textContent = `Completion: ${selectedCompletionPercentage}`;
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
+
+            // ✅ Update QR Code with Discounted Price
             generateQRCode(discountedAmount);
+
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
         } else {
