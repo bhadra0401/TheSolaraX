@@ -130,21 +130,6 @@
 
 
 function generateQRCode(amount, planName, planPercentage) {
-    // ✅ Always fetch the latest amount from LocalStorage
-    let storedAmount = localStorage.getItem("selectedAmount");
-
-    if (!storedAmount || isNaN(storedAmount)) {
-        console.error("❌ Invalid Amount for QR Code:", storedAmount);
-        alert("Invalid amount selected. Please choose a valid plan.");
-        return;
-    }
-
-    amount = parseFloat(storedAmount); // ✅ Use the latest discounted amount
-
-    // ✅ Ensure valid plan details
-    planName = planName || localStorage.getItem("selectedPlanName") || "Unknown Plan";
-    planPercentage = planPercentage || localStorage.getItem("selectedCompletionPercentage") || "0%";
-
     // ✅ Store updated values in LocalStorage
     localStorage.setItem("selectedAmount", amount);
     localStorage.setItem("selectedPlanName", planName);
@@ -156,7 +141,7 @@ function generateQRCode(amount, planName, planPercentage) {
     document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
     document.getElementById("selected-plan").style.display = "block";
 
-    // ✅ Generate QR Code
+    // ✅ Generate QR Code with the correct amount
     try {
         const qr = qrcode(4, 'L');
         qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
@@ -173,6 +158,7 @@ function generateQRCode(amount, planName, planPercentage) {
         alert("Error generating QR Code. Please try again.");
     }
 }
+
 
 
 
@@ -259,11 +245,11 @@ let discountApplied = false;
 let referralCode = "";
 
 function applyReferralCode() {
-    const code = document.getElementById("referral-code").value.trim().toUpperCase(); // Convert to uppercase
+    const code = document.getElementById("referral-code").value.trim().toUpperCase(); 
 
     if (discountApplied) {
         alert("Referral code already applied!");
-        return; // Prevent multiple applications
+        return;
     }
 
     if (!code) {
@@ -282,24 +268,20 @@ function applyReferralCode() {
 
         if (data.valid) {
             discountApplied = true;
-            referralCode = code;
             localStorage.setItem("appliedReferralCode", code);
 
             let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
             let discountedAmount = (selectedAmount * 0.8).toFixed(2); // Apply 20% discount
-
-            // ✅ Update LocalStorage with the discounted amount
             localStorage.setItem("selectedAmount", discountedAmount);
 
             let selectedPlanName = localStorage.getItem("selectedPlanName") || "Unknown Plan";
             let selectedCompletionPercentage = localStorage.getItem("selectedCompletionPercentage") || "0%";
 
-            // ✅ Update UI with the new discounted amount
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
 
-            // ✅ Regenerate QR Code with Discounted Amount
+            // ✅ Generate QR Code with the new discounted amount
             generateQRCode(parseFloat(discountedAmount), selectedPlanName, selectedCompletionPercentage);
 
         } else {
