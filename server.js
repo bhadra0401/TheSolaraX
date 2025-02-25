@@ -10,7 +10,9 @@ const User = require("./userModel");
 const authRouter = require("./authRouter");
 const jwt = require("jsonwebtoken"); // ✅ Add this line
 // ✅ Ensure `validReferralCodes` is always an array
-const validReferralCodes = process.env.VALID_REFERRAL_CODES ? process.env.VALID_REFERRAL_CODES.split(",") : [];
+const validReferralCodes = process.env.VALID_REFERRAL_CODES 
+    ? process.env.VALID_REFERRAL_CODES.split(",").map(code => code.trim().toUpperCase()) 
+    : [];
 
 
 const app = express();
