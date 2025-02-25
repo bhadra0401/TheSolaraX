@@ -149,7 +149,7 @@
         document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
     }
 
-    function submitPaymentProof() {
+   function submitPaymentProof() {
     const token = localStorage.getItem("token");
     const codetantraId = document.getElementById("codetantra-id").value.trim();
     const codetantraPassword = document.getElementById("codetantra-password").value.trim();
@@ -188,6 +188,7 @@
     })
     .catch(() => alert("Error submitting proof."));
 }
+
 
 
 
@@ -230,11 +231,16 @@ let discountApplied = false;
 let referralCode = "";
 
 function applyReferralCode() {
-    const code = document.getElementById("referral-code").value.trim();
+    const code = document.getElementById("referral-code").value.trim().toUpperCase(); // ✅ Convert to uppercase
 
     if (discountApplied) {
         alert("Referral code already applied!");
         return; // Prevent multiple applications
+    }
+
+    if (!code) {
+        alert("Please enter a referral code.");
+        return;
     }
 
     fetch(`${backendUrl}/validate-referral`, {
@@ -245,22 +251,19 @@ function applyReferralCode() {
     .then(res => res.json())
     .then(data => {
         console.log("📌 Referral Code Response:", data); // ✅ Debugging log
+
         if (data.valid) {
             discountApplied = true;
             referralCode = code;
             localStorage.setItem("appliedReferralCode", code); // ✅ Store in LocalStorage
+
             let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
             let discountedAmount = (selectedAmount * 0.8).toFixed(2); // ✅ Apply only once
 
             localStorage.setItem("selectedAmount", discountedAmount); // ✅ Save updated amount
 
             // ✅ Update UI with Correct Details
-            document.getElementById("selected-plan-name").textContent = selectedPlanName;
-            document.getElementById("selected-plan-details").textContent = `Completion: ${selectedCompletionPercentage}`;
             document.getElementById("selected-plan-amount").textContent = `Amount: ₹${discountedAmount}`;
-
-            // ✅ Update QR Code with Discounted Price
-            generateQRCode(discountedAmount, selectedPlanName, selectedCompletionPercentage);
 
             document.getElementById("referral-status").textContent = "Referral code applied!";
             document.getElementById("referral-status").style.color = "green";
@@ -270,12 +273,14 @@ function applyReferralCode() {
         }
         document.getElementById("referral-status").style.display = "block";
     })
-    .catch(() => {
+    .catch(error => {
+        console.error("❌ Error validating referral code:", error);
         document.getElementById("referral-status").textContent = "Error validating referral code.";
         document.getElementById("referral-status").style.color = "red";
         document.getElementById("referral-status").style.display = "block";
     });
 }
+
 
 
 
