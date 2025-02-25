@@ -129,25 +129,32 @@
 
     let selectedAmount = localStorage.getItem("selectedAmount") || 0;
 
-    function generateQRCode(amount, planName, planPercentage) {
-        selectedAmount = amount;
-        localStorage.setItem("selectedAmount", amount);
-        localStorage.setItem("selectedPlanName", planName); // ✅ Store Plan Name
-        localStorage.setItem("selectedCompletionPercentage", planPercentage); // ✅ Store Completion %
-
-        document.getElementById("selected-plan-name").textContent = planName;
-        document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
-        document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
-        document.getElementById("selected-plan").style.display = "block";
-        
-        const qr = qrcode(0, 'L');
-        qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
-        qr.make();
-        document.getElementById("qrcode").innerHTML = qr.createImgTag();
-        document.getElementById("qr-code-container").style.display = "block";
-        document.getElementById("payment-proof-form").style.display = "block";
-        document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
+function generateQRCode(amount, planName, planPercentage) {
+    if (!amount || isNaN(amount)) {
+        console.error("❌ Invalid Amount for QR Code:", amount);
+        return;
     }
+
+    selectedAmount = amount;
+    localStorage.setItem("selectedAmount", amount);
+    localStorage.setItem("selectedPlanName", planName);
+    localStorage.setItem("selectedCompletionPercentage", planPercentage);
+
+    document.getElementById("selected-plan-name").textContent = planName;
+    document.getElementById("selected-plan-details").textContent = `Completion: ${planPercentage}`;
+    document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
+    document.getElementById("selected-plan").style.display = "block";
+
+    const qr = qrcode(0, 'L');
+    qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
+    qr.make();
+    document.getElementById("qrcode").innerHTML = qr.createImgTag();
+    document.getElementById("qr-code-container").style.display = "block";
+    document.getElementById("payment-proof-form").style.display = "block";
+    document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
+
+    console.log("✅ QR Code Updated with Amount:", amount);
+}
 
    function submitPaymentProof() {
     const token = localStorage.getItem("token");
