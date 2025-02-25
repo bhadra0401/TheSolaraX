@@ -95,11 +95,12 @@
     <p>After payment, submit your proof below.</p>
 </div>
 
-<div id="referral-section" style="text-align: center; margin-top: 20px;">
+<div id="referral-section" style="text-align: center; margin-top: 20px; display: none;">
     <input type="text" id="referral-code" placeholder="Enter Referral Code">
     <button onclick="applyReferralCode()">Apply Code</button>
     <p id="referral-status" style="color: red; display: none;"></p>
 </div>
+
 
 
 <div id="payment-proof-form" style="display: none;">
@@ -141,23 +142,30 @@ function generateQRCode(amount, planName, planPercentage) {
     document.getElementById("selected-plan-amount").textContent = `Amount: ₹${amount}`;
     document.getElementById("selected-plan").style.display = "block";
 
-    // ✅ Generate QR Code with the correct amount
+    // ✅ Show Referral Code Section & Payment Proof Form
+    document.getElementById("referral-section").style.display = "block";
+    document.getElementById("payment-proof-form").style.display = "block";
+    document.getElementById("qr-code-container").style.display = "block";
+
+    // ✅ Scroll Down Smoothly to Referral Section
+    setTimeout(() => {
+        document.getElementById("referral-section").scrollIntoView({ behavior: "smooth" });
+    }, 500);
+
+    // ✅ Generate QR Code
     try {
         const qr = qrcode(4, 'L');
         qr.addData(`upi://pay?pa=herobhadra@okicici&pn=zeBRO&am=${amount}`);
         qr.make();
 
         document.getElementById("qrcode").innerHTML = qr.createImgTag();
-        document.getElementById("qr-code-container").style.display = "block";
-        document.getElementById("payment-proof-form").style.display = "block";
-        document.getElementById("selected-plan").scrollIntoView({ behavior: "smooth" });
-
         console.log("✅ QR Code Updated with Amount:", amount);
     } catch (error) {
         console.error("❌ QR Code Generation Failed:", error);
         alert("Error generating QR Code. Please try again.");
     }
 }
+
 
 
 
