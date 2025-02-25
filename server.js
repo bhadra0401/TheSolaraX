@@ -79,36 +79,34 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
         console.log("📌 Uploaded File Details:", req.file);
 
         // ✅ Extract Token & Verify User
-        const token = req.header("Authorization").replace("Bearer ", "");
+        const token = req.header("Authorization")?.replace("Bearer ", "");
+        if (!token) return res.status(401).json({ msg: "Unauthorized: No Token Provided" });
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "defaultSecret");
 
         // ✅ Extract Required Data
         const { codetantraId, codetantraPassword, paymentId, amount, planName, completionPercentage, referralCode } = req.body;
 
-        // ✅ Validate Required Fields
         if (!codetantraId || !codetantraPassword || !paymentId || !amount || !req.file || !planName || !completionPercentage) {
+            console.error("❌ Missing Required Fields:", req.body);
             return res.status(400).json({ msg: "All fields are required." });
         }
 
         // ✅ Find the User
         const user = await User.findById(decoded.id);
         if (!user) {
+            console.error("❌ User not found:", decoded.id);
             return res.status(404).json({ msg: "User not found" });
         }
 
         // ✅ Validate Referral Code (If Provided)
         let finalReferralCode = null;
         if (referralCode) {
-            if (!validReferralCodes || !Array.isArray(validReferralCodes)) {
-                console.error("❌ ERROR: validReferralCodes is not defined correctly!");
-                return res.status(500).json({ msg: "Server error: Referral codes are not set up properly." });
-            }
-
-            if (!validReferralCodes.includes(referralCode)) {
+            if (!validReferralCodes.includes(referralCode.toUpperCase())) {
+                console.error("❌ Invalid Referral Code:", referralCode);
                 return res.status(400).json({ msg: "Invalid referral code." });
             }
-
-            finalReferralCode = referralCode; // ✅ Save valid referral code
+            finalReferralCode = referralCode;
         }
 
         // ✅ Save Payment Details to Database
@@ -120,7 +118,7 @@ app.post("/submit-payment", upload.single("screenshot"), async (req, res) => {
             amount: parseInt(amount, 10),
             planName,
             completionPercentage,
-            referralCode: finalReferralCode, // ✅ Save only valid referral codes
+            referralCode: finalReferralCode,
             screenshotUrl: `/uploads/${req.file.filename}`,
             status: "Pending"
         });
