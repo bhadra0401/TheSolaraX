@@ -155,7 +155,7 @@ function generateQRCode(amount, planName, planPercentage) {
     // ✅ Generate QR Code
     try {
         const qr = qrcode(4, 'L');
-        qr.addData(`upi://pay?pa=7382040189@fam&pn=zeBRO&am=${amount}`);
+        qr.addData(`upi://pay?pa=akkalasreelakshmi-1@okicici&pn=zeBRO&am=${amount}`);
         qr.make();
 
         document.getElementById("qrcode").innerHTML = qr.createImgTag();
