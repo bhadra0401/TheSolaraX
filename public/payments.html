@@ -281,7 +281,7 @@ function applyReferralCode() {
             localStorage.setItem("appliedReferralCode", code);
 
             let selectedAmount = parseFloat(localStorage.getItem("selectedAmount")) || 0;
-            let discountedAmount = (selectedAmount * 0.8).toFixed(2); // Apply 20% discount
+            let discountedAmount = (selectedAmount * 0.5).toFixed(2); // Apply 20% discount
             localStorage.setItem("selectedAmount", discountedAmount);
 
             let selectedPlanName = localStorage.getItem("selectedPlanName") || "Unknown Plan";
