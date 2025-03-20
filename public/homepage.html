@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>zeBRO - Home</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
 <body>
 
@@ -19,13 +20,36 @@
 </header>
 
 <section class="hero">
-    <h2>Welcome to zeBRO</h2>
-    <p>Your one-stop solution for completing Codetantra courses with ease.</p>
-    <button class="cta" onclick="window.location.href='payments.html'">Get Started</button>
+    <div class="hero-content">
+        <h2>Complete Your Codetantra Course in Just <span class="highlight">12 Hours</span>!</h2>
+        <p>Fast, Secure, and Affordable. Use <span class="highlight">Referral Code</span> to Get <span class="discount">30% OFF</span>!</p>
+        <button class="cta" onclick="window.location.href='payments.html'">Get Started</button>
+    </div>
+    <div class="hero-image">
+        <img src="secure-payment.png" alt="Secure Payment">
+    </div>
+</section>
+
+<section class="features">
+    <div class="feature">
+        <i class="fas fa-clock"></i>
+        <h3>Fast Completion</h3>
+        <p>Get your course done within 12 hours.</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-shield-alt"></i>
+        <h3>100% Secure</h3>
+        <p>All payments and data are encrypted for your safety.</p>
+    </div>
+    <div class="feature">
+        <i class="fas fa-tag"></i>
+        <h3>Big Discounts</h3>
+        <p>Use referral codes to save up to 30%!</p>
+    </div>
 </section>
 
 <script>
-    const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
+    const backendUrl = "https://thesolarax.onrender.com"; 
 
     document.addEventListener("DOMContentLoaded", async function () {
         const token = localStorage.getItem("token");
