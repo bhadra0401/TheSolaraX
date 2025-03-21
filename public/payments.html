@@ -7,6 +7,11 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
     <link rel="stylesheet" href="style.css">
     <style>
+.payment-container {
+    position: relative;
+    margin-bottom: 20px;
+}
+
 .payment-options {
     display: flex;
     overflow-x: auto;
@@ -22,27 +27,39 @@
     display: none; /* Hide scrollbar for Chrome/Safari */
 }
 
-.payment-row {
-    display: flex;
-    flex: 0 0 auto; /* Prevent shrinking */
-    scroll-snap-align: start;
-    min-width: 100%;
-}
-
 .plan {
-    flex: 0 0 auto; /* Keep items in a row */
+    flex: 0 0 auto; /* Prevent shrinking */
     width: 250px;
     text-align: center;
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    scroll-snap-align: center;
 }
 
+/* Ensure responsiveness */
 @media (max-width: 768px) {
-    .payment-options {
-        scroll-snap-type: x mandatory;
-        overflow-x: scroll;
-        display: flex;
-        flex-wrap: nowrap;
+    .plan {
+        width: 80%; /* Show only 1-2 plans on smaller screens */
     }
 }
+
+/* Navigation buttons */
+.slider-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: #000;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    z-index: 100;
+}
+
+.left { left: 10px; }
+.right { right: 10px; }
     </style>
 </head>
 <body>
@@ -57,52 +74,53 @@
 </header>
 
 <h1>Make a Payment</h1>
-<div class="payment-options">
-    <div class="payment-row">
-    <div class="plan">
-        <h3>Java Full Stack SEC - 2 -</h3>
-        <h2>100%</h2>
-        <p>₹599</p>
-        <button onclick="generateQRCode(599, 'Java Full Stack SEC - 2 -', '100%')">Pay ₹599</button>
+<!-- Category 1 -->
+<div class="payment-container">
+    <h2>Java Full Stack SEC - 2</h2>
+    <button class="slider-btn left" onclick="scrollLeft('category1')">◀</button>
+    <div class="payment-options" id="category1">
+        <div class="plan">
+            <h3>100%</h3>
+            <p>₹599</p>
+            <button onclick="generateQRCode(599, 'Java Full Stack SEC - 2', '100%')">Pay ₹599</button>
+        </div>
+        <div class="plan">
+            <h3>75%</h3>
+            <p>₹499</p>
+            <button onclick="generateQRCode(499, 'Java Full Stack SEC - 2', '75%')">Pay ₹499</button>
+        </div>
+        <div class="plan">
+            <h3>50%</h3>
+            <p>₹399</p>
+            <button onclick="generateQRCode(399, 'Java Full Stack SEC - 2', '50%')">Pay ₹399</button>
+        </div>
     </div>
-    <div class="plan">
-        <h3>Java Full Stack SEC - 2 -</h3>
-        <h2>75%</h2>
-        <p>₹499</p>
-        <button onclick="generateQRCode(499, 'Java Full Stack SEC - 2 -', '75%')">Pay ₹499</button>
-    </div>
-    <div class="plan">
-        <h3>Java Full Stack SEC - 2 -</h3>
-        <h2>50%</h2>
-        <p>₹399</p>
-        <button onclick="generateQRCode(399, 'Java Full Stack SEC - 2 -', '50%')">Pay ₹399</button>
-    </div>
-    </div>
-</div>
- <div class="payment-options">
-    <div class="payment-row">
-    <div class="plan">
-        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
-        <h2>100%</h2>
-        <p>₹599</p>
-        <button onclick="generateQRCode(599, 'Java Full Stack Laboratory SEC- 2 -', '100%')">Pay ₹599</button>
-    </div>
-    <div class="plan">
-        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
-        <h2>75%</h2>
-        <p>₹499</p>
-        <button onclick="generateQRCode(499, 'Java Full Stack Laboratory SEC- 2 -', '75%')">Pay ₹499</button>
-    </div>
-    <div class="plan">
-        <h3>Java Full Stack Laboratory SEC- 2 -</h3>
-        <h2>50%</h2>
-        <p>₹399</p>
-        <button onclick="generateQRCode(399, 'Java Full Stack Laboratory SEC- 2 -', '50%')">Pay ₹399</button>
-    </div>
-    </div>
-</div>
+    <button class="slider-btn right" onclick="scrollRight('category1')">▶</button>
 </div>
 
+<!-- Category 2 -->
+<div class="payment-container">
+    <h2>Java Full Stack Laboratory SEC - 2</h2>
+    <button class="slider-btn left" onclick="scrollLeft('category2')">◀</button>
+    <div class="payment-options" id="category2">
+        <div class="plan">
+            <h3>100%</h3>
+            <p>₹599</p>
+            <button onclick="generateQRCode(599, 'Java Full Stack Laboratory SEC - 2', '100%')">Pay ₹599</button>
+        </div>
+        <div class="plan">
+            <h3>75%</h3>
+            <p>₹499</p>
+            <button onclick="generateQRCode(499, 'Java Full Stack Laboratory SEC - 2', '75%')">Pay ₹499</button>
+        </div>
+        <div class="plan">
+            <h3>50%</h3>
+            <p>₹399</p>
+            <button onclick="generateQRCode(399, 'Java Full Stack Laboratory SEC - 2', '50%')">Pay ₹399</button>
+        </div>
+    </div>
+    <button class="slider-btn right" onclick="scrollRight('category2')">▶</button>
+</div>
 <div class="selected-plan" id="selected-plan">
     <h2 id="selected-plan-name"></h2>
     <p id="selected-plan-details"></p>
@@ -148,7 +166,13 @@
         fetchPayments();
     });
 
+function scrollLeft(category) {
+    document.getElementById(category).scrollBy({ left: -250, behavior: 'smooth' });
+}
 
+function scrollRight(category) {
+    document.getElementById(category).scrollBy({ left: 250, behavior: 'smooth' });
+}
 
 function generateQRCode(amount, planName, planPercentage) {
     // ✅ Store updated values in LocalStorage
