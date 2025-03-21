@@ -77,7 +77,7 @@
 <!-- Category 1 -->
 <div class="payment-container">
     <h2>Java Full Stack SEC - 2</h2>
-    <button class="slider-btn left" onclick="scrollLeft('category1')">◀</button>
+    
     <div class="payment-options" id="category1">
         <div class="plan">
             <h3>100%</h3>
@@ -95,13 +95,13 @@
             <button onclick="generateQRCode(399, 'Java Full Stack SEC - 2', '50%')">Pay ₹399</button>
         </div>
     </div>
-    <button class="slider-btn right" onclick="scrollRight('category1')">▶</button>
+    
 </div>
 
 <!-- Category 2 -->
 <div class="payment-container">
     <h2>Java Full Stack Laboratory SEC - 2</h2>
-    <button class="slider-btn left" onclick="scrollLeft('category2')">◀</button>
+    
     <div class="payment-options" id="category2">
         <div class="plan">
             <h3>100%</h3>
@@ -119,7 +119,7 @@
             <button onclick="generateQRCode(399, 'Java Full Stack Laboratory SEC - 2', '50%')">Pay ₹399</button>
         </div>
     </div>
-    <button class="slider-btn right" onclick="scrollRight('category2')">▶</button>
+    
 </div>
 <div class="selected-plan" id="selected-plan">
     <h2 id="selected-plan-name"></h2>
@@ -166,13 +166,7 @@
         fetchPayments();
     });
 
-function scrollLeft(category) {
-    document.getElementById(category).scrollBy({ left: -250, behavior: 'smooth' });
-}
 
-function scrollRight(category) {
-    document.getElementById(category).scrollBy({ left: 250, behavior: 'smooth' });
-}
 
 function generateQRCode(amount, planName, planPercentage) {
     // ✅ Store updated values in LocalStorage
