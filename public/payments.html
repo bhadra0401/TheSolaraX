@@ -8,9 +8,13 @@
     <link rel="stylesheet" href="style.css">
     <style>
         .payment-options {
-            display: grid;
+           
+                display: flex;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        gap: 10px;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            
             justify-content: center;
             align-items: center;
             text-align: center;
@@ -18,6 +22,14 @@
             margin: auto;
         }
 
+.payment-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    min-width: 100%;
+    scroll-snap-align: start;
+}
         .selected-plan {
             display: none;
             background: #f9f9f9;
@@ -28,6 +40,15 @@
             max-width: 400px;
             text-align: center;
         }
+        @media (max-width: 768px) {
+    .payment-row {
+        flex-direction: column;
+        align-items: center;
+    }
+    .payment-container {
+        width: 80%;
+    }
+}
     </style>
 </head>
 <body>
@@ -43,6 +64,7 @@
 
 <h1>Make a Payment</h1>
 <div class="payment-options">
+    <div class="payment-row">
     <div class="plan">
         <h3>Java Full Stack SEC - 2 -</h3>
         <h2>100%</h2>
@@ -61,8 +83,8 @@
         <p>₹399</p>
         <button onclick="generateQRCode(399, 'Java Full Stack SEC - 2 -', '50%')">Pay ₹399</button>
     </div>
-</div>
-<div class="payment-options">
+    </div>
+    <div class="payment-row">
     <div class="plan">
         <h3>Java Full Stack Laboratory SEC- 2 -</h3>
         <h2>100%</h2>
@@ -80,6 +102,7 @@
         <h2>50%</h2>
         <p>₹399</p>
         <button onclick="generateQRCode(399, 'Java Full Stack Laboratory SEC- 2 -', '50%')">Pay ₹399</button>
+    </div>
     </div>
 </div>
 
