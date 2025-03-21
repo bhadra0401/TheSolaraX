@@ -4,45 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>zeBRO - Home</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        .header {
-            background-color: #007bff;
-            padding: 15px;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-        }
-        .nav {
-            display: flex;
-            justify-content: center;
-            background-color: #0056b3;
-            padding: 10px;
-        }
-        .nav a {
-            color: white;
-            text-decoration: none;
-            margin: 0 15px;
-            font-size: 18px;
-        }
-        .hero {
+    <link rel="stylesheet" href="style.css">
+<style>
+
+        .hero2 {
             padding: 50px 20px;
             background-color: white;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             margin: 20px;
             border-radius: 10px;
         }
-        .hero h1 {
+        .hero2 h1 {
             font-size: 36px;
             font-weight: bold;
         }
-        .hero p {
+        .hero2 p {
             font-size: 20px;
             color: #555;
         }
@@ -50,16 +26,7 @@
             color: #ffcc00;
             font-weight: bold;
         }
-        .cta-button {
-            background-color: #ff4500;
-            color: white;
-            font-size: 20px;
-            padding: 15px 30px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
+
         .features {
             display: flex;
             justify-content: center;
@@ -76,14 +43,21 @@
     </style>
 </head>
 <body>
-    <div class="header">zeBRO</div>
-    <div class="nav">
-        <a href="#">Services</a>
-        <a href="#">Payments</a>
-        <a href="#">Profile</a>
-        <a href="#">Logout</a>
-    </div>
-    <div class="hero">
+
+<header>
+    <div class="logo">zeBRO</div>
+    <nav>
+        <a href="plans.html">Services</a>
+        <a href="payments.html">Payments</a>
+        <a href="profile.html" id="profileLink">Loading...</a>
+        <a href="#" id="logoutBtn">Logout</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <h2>Welcome to zeBRO</h2>
+    <p>Your one-stop solution for completing Codetantra courses with ease.</p>
+	 <div class="hero2">
         <h1>
             <span>🚀</span> Complete Your Codetantra Course in 12 Hours!
         </h1>
@@ -104,6 +78,39 @@
             <h3>30% Off</h3>
             <p>Apply referral codes for huge savings.</p>
         </div>
-    </div>
+    <button class="cta" onclick="window.location.href='payments.html'">Get Started</button>
+</section>
+
+<script>
+    const backendUrl = "https://thesolarax.onrender.com"; // ✅ Updated backend URL
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        const token = localStorage.getItem("token");
+        if (!token) {
+            alert("Please log in first.");
+            window.location.href = "index.html";
+            return;
+        }
+        try {
+            const response = await fetch(`${backendUrl}/auth/profile`, {
+                headers: { "Authorization": `Bearer ${token}` }
+            });
+            const data = await response.json();
+            if (response.ok) {
+                document.getElementById("profileLink").textContent = data.name;
+            } else {
+                document.getElementById("profileLink").textContent = "Profile";
+            }
+        } catch (error) {
+            document.getElementById("profileLink").textContent = "Profile";
+        }
+    });
+    
+    document.getElementById("logoutBtn").addEventListener("click", function () {
+        localStorage.removeItem("token");
+        window.location.href = "index.html";
+    });
+</script>
+
 </body>
 </html>
