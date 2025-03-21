@@ -7,46 +7,40 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode-generator"></script>
     <link rel="stylesheet" href="style.css">
     <style>
-        .payment-options {
-           
-                display: flex;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        gap: 10px;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            max-width: 900px;
-            margin: auto;
-        }
+.payment-options {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 10px;
+    padding: 10px;
+    white-space: nowrap; /* Prevent wrapping */
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+    -ms-overflow-style: none; /* Hide scrollbar for IE */
+}
+
+.payment-options::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
 
 .payment-row {
     display: flex;
-    flex-direction: row;
-    justify-content: center;
-    gap: 15px;
-    min-width: 100%;
+    flex: 0 0 auto; /* Prevent shrinking */
     scroll-snap-align: start;
+    min-width: 100%;
 }
-        .selected-plan {
-            display: none;
-            background: #f9f9f9;
-            padding: 15px;
-            margin: 20px auto;
-            border-radius: 10px;
-            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
-            text-align: center;
-        }
-        @media (max-width: 768px) {
-    .payment-row {
-        flex-direction: column;
-        align-items: center;
-    }
-    .payment-container {
-        width: 80%;
+
+.plan {
+    flex: 0 0 auto; /* Keep items in a row */
+    width: 250px;
+    text-align: center;
+}
+
+@media (max-width: 768px) {
+    .payment-options {
+        scroll-snap-type: x mandatory;
+        overflow-x: scroll;
+        display: flex;
+        flex-wrap: nowrap;
     }
 }
     </style>
