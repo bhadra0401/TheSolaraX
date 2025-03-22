@@ -7,10 +7,16 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="header">
-        <h1>User Profile</h1>
-        <a href="homepage.html" class="back-button">Back to Home</a>
-    </div>
+    <header>
+        <div class="logo">zeBRO</div>
+        <nav>
+            <a href="plans.html">Services</a>
+            <a href="payments.html">Payments</a>
+            <a href="profile.html" id="profileLink">Loading...</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </nav>
+    </header>
+    
     <div class="profile-container">
         <i class="fas fa-user-circle profile-icon"></i>
         <div class="profile-info">
@@ -24,6 +30,7 @@
             <button onclick="updatePassword()">Update Password</button>
         </div>
     </div>
+    
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const token = localStorage.getItem("token");
