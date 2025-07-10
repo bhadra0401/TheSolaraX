@@ -3,12 +3,17 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node app.js", 
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm run build", 
+    "dev": "nodemon app.js"
   },
-  "keywords": [],
+  "keywords": [
+    "login", "system", "node", "express", "jwt", "bcrypt", "mongoose", "multer", "nodemailer", "razorpay"
+  ],
   "author": "",
   "license": "ISC",
-  "description": "",
+  "description": "A login system with JWT authentication, payment gateway integration, and file uploads.",
   "dependencies": {
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -21,5 +26,11 @@
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.10.0",
     "razorpay": "^2.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  },
+  "engines": {
+    "node": "16.x"
   }
 }
